@@ -66,7 +66,6 @@ class LightTimer extends IPSModule
         // return true;
     }
 
-
     /**
      * This function will be available automatically after the module is imported with the module control.
      * Using the custom prefix this function will be callable from PHP and JSON-RPC through:.
