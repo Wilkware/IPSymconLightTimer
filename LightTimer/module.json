@@ -1,0 +1,15 @@
+{
+  "id": "{56E8F343-76FD-9B99-35CF-1D358766C7E9}",
+  "name": "Light Timer Module",
+  "type": 3,
+  "vendor": "",
+  "aliases":
+  [
+    "Licht-Zeitschaltuhr",
+    "Zeitschaltuhr"
+  ],
+  "parentRequirements": [],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "LTM"
+}
