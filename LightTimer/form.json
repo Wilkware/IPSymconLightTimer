@@ -17,24 +17,24 @@
             "items": [
                 {"type": "Select", "name": "TimingAutomatic", "caption": "Automatic:",  "width": "450px",
                     "options": [
-                        {"label": "Aus", "value": "0"},
-                        {"label": "Morgens (HA)", "value": "1"},
-                        {"label": "Abends (HA)", "value": "2"},
-                        {"label": "Früh & Abend (VA)", "value": "4"}
+                        {"label": "Off", "value": "0"},
+                        {"label": "Morning (semi-automatic)", "value": "1"},
+                        {"label": "Evening (semi-automatic)", "value": "2"},
+                        {"label": "Early & Evening (fully-automatic)", "value": "4"}
                     ]
                 },
                 {"type": "Select", "name": "TimingStart", "caption": "Twilight start:",  "width": "450px",
                     "options": [
-                        {"label": "Zivile Dämmerung", "value": "CivilTwilightStart"},
-                        {"label": "Nautische Dämmerung", "value": "NauticTwilightStart"},
-                        {"label": "Astronomische Dämmerung", "value": "AstronomicTwilightStart"}
+                        {"label": "Civil twilight", "value": "CivilTwilightStart"},
+                        {"label": "Nautic twilight", "value": "NauticTwilightStart"},
+                        {"label": "Astronomic twilight", "value": "AstronomicTwilightStart"}
                     ]
                 },
                 {"type": "Select", "name": "TimingEnd", "caption": "Twilight end:",  "width": "450px",
                     "options": [
-                        {"label": "Zivile Dämmerung", "value": "CivilTwilightStart"},
-                        {"label": "Nautische Dämmerung", "value": "NauticTwilightStart"},
-                        {"label": "Astronomische Dämmerung", "value": "AstronomicTwilightStart"}
+                        {"label": "Civil twilight", "value": "CivilTwilightEnd"},
+                        {"label": "Nautic twilight", "value": "NauticTwilightEnd"},
+                        {"label": "Astronomic twilight", "value": "AstronomicTwilightEnd"}
                     ]
                 },
                 {"type": "SelectEvent", "name": "TimingSchedule", "caption": "Schedule:" }
@@ -45,7 +45,7 @@
             "caption": "Device ...",
             "items": [
                 {"type": "SelectVariable", "name": "DeviceVariable", "caption": "Switch Variable:" },
-                {"type": "Label", "name": "DeviceExec", "caption": "Simultaneous execution of a script." },
+                {"type": "Label", "name": "DeviceExec", "caption": "... simultaneous execution of a script." },
                 {"type": "SelectScript", "name": "DeviceScript", "caption": "Script:" }
             ]
         },
