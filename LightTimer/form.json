@@ -17,43 +17,45 @@
             "items": [
                 {"type": "Select", "name": "TimingAutomatic", "caption": "Automatic:",  "width": "450px",
                     "options": [
-                        {"label": "Off", "value": "0"},
-                        {"label": "Morning (semi-automatic)", "value": "1"},
-                        {"label": "Evening (semi-automatic)", "value": "2"},
-                        {"label": "Early & Evening (fully-automatic)", "value": "4"}
+                        {"label": "Off", "value": 0},
+                        {"label": "Morning (semi-automatic)", "value": 1},
+                        {"label": "Evening (semi-automatic)", "value": 2},
+                        {"label": "Early & Evening (fully-automatic)", "value": 4}
                     ]
                 },
-                {"type": "Select", "name": "TimingStart", "caption": "Twilight start:",  "width": "450px",
+                {"type": "Select", "name": "TimingStart", "caption": "Conditional switch on:",  "width": "450px",
                     "options": [
+                        {"label": "Sunrise", "value": "Sunrise"},
                         {"label": "Civil twilight", "value": "CivilTwilightStart"},
                         {"label": "Nautic twilight", "value": "NauticTwilightStart"},
                         {"label": "Astronomic twilight", "value": "AstronomicTwilightStart"}
                     ]
                 },
-                {"type": "Select", "name": "TimingEnd", "caption": "Twilight end:",  "width": "450px",
+                {"type": "Select", "name": "TimingEnd", "caption": "Conditional switch off:",  "width": "450px",
                     "options": [
+                        {"label": "Sunset", "value": "Sunset"},
                         {"label": "Civil twilight", "value": "CivilTwilightEnd"},
                         {"label": "Nautic twilight", "value": "NauticTwilightEnd"},
                         {"label": "Astronomic twilight", "value": "AstronomicTwilightEnd"}
                     ]
                 },
-                {"type": "SelectEvent", "name": "TimingSchedule", "caption": "Schedule:" }
+                {"type": "SelectEvent", "name": "TimingSchedule", "caption": "Schedule:",  "width": "450px" }
             ]
         },
         {
             "type": "ExpansionPanel",
             "caption": "Device ...",
             "items": [
-                {"type": "SelectVariable", "name": "DeviceVariable", "caption": "Switch Variable:" },
-                {"type": "Label", "name": "DeviceExec", "caption": "... simultaneous execution of a script." },
-                {"type": "SelectScript", "name": "DeviceScript", "caption": "Script:" }
+                {"type": "SelectVariable", "name": "DeviceVariable", "caption": "Switch Variable:",  "width": "450px"},
+                {"type": "Label", "name": "DeviceExec", "caption": "... simultaneous execution of a script."},
+                {"type": "SelectScript", "name": "DeviceScript", "caption": "Script:",  "width": "450px"}
             ]
         },
         {
             "type": "ExpansionPanel",
-            "caption": "Advanced settings ...",
+            "caption": "Settings ...",
             "items": [
-                {"type": "CheckBox", "name": "SettingsBool", "caption": "State variable is only a simple boolean!" },
+                {"type": "CheckBox", "name": "SettingsBool", "caption": "Switch variable is only a simple boolean!" },
                 {"type": "CheckBox", "name": "SettingsSwitch", "caption": "Additionally create a normal switch variable (e.g. for WebFront)?" }
             ]
         }
