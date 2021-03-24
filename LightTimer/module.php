@@ -13,11 +13,13 @@ class LightTimer extends IPSModule
     use DebugHelper;
 
     // Schedule constant
+    const SCHEDULE_OFF = 1;
+    const SCHEDULE_ON = 2;
     const SCHEDULE_NAME = 'Zeitplan';
     const SCHEDULE_IDENT = 'weekly_schedule';
     const SCHEDULE_SWITCH = [
-        1 => ['Off', 0xFF0000, "LTM_Schedule(\$_IPS['TARGET'], \$_IPS['ACTION']);"],
-        2 => ['On', 0x00FF00, "LTM_Schedule(\$_IPS['TARGET'], \$_IPS['ACTION']);"],
+        self::SCHEDULE_OFF => ['Off', 0xFF0000, "LTM_Schedule(\$_IPS['TARGET'], \$_IPS['ACTION']);"],
+        self::SCHEDULE_ON  => ['On', 0x00FF00, "LTM_Schedule(\$_IPS['TARGET'], \$_IPS['ACTION']);"],
     ];
 
     // Location Control
@@ -128,14 +130,16 @@ class LightTimer extends IPSModule
         $cs = 0;
         $ce = 0;
         // true == (1 oder 4)
-        if ($am | 5) {
+        if (($am & 5) > 0) {
             $start = $this->ReadPropertyString('TimingStart');
             $cs = $this->GetLocationID($start);
+            $this->SendDebug(__FUNCTION__, $start . ' = ' . $cs);
         }
         // true == (2 oder 4)
-        if ($am | 6) {
+        if (($am & 6) > 0) {
             $end = $this->ReadPropertyString('TimingEnd');
-            $cs = $this->GetLocationID($end);
+            $ce = $this->GetLocationID($end);
+            $this->SendDebug(__FUNCTION__, $end . ' = ' . $ce);
         }
         // Write
         $this->WriteAttributeInteger('ConditionalStart', $cs);
@@ -172,75 +176,21 @@ class LightTimer extends IPSModule
                 $varID = $this->ReadPropertyInteger('DeviceVariable');
                 $startID = $this->ReadAttributeInteger('ConditionalStart');
                 $endID = $this->ReadAttributeInteger('ConditionalEnd');
-                if (($senderID != $varID) || ($senderID != $startID) || ($senderID != $endID) ) {
+                if (($senderID != $varID) || ($senderID != $startID) || ($senderID != $endID)) {
                     if (($senderID == $varID) && ($data[1] == true)) {
                         $this->SwitchState($data[0]);
-                    }
-                    elseif (($senderID == $startID) && ($data[1] == true)) {
+                    } elseif (($senderID == $startID) && ($data[1] == true)) {
                         $this->SendDebug(__FUNCTION__, $senderID . ': conditional start changed');
-                        $this->Schedule(12);
-                    }
-                    elseif (($senderID == $endID) && ($data[1] == true)) {
+                        $this->Schedule(10 + self::SCHEDULE_ON);
+                    } elseif (($senderID == $endID) && ($data[1] == true)) {
                         $this->SendDebug(__FUNCTION__, $senderID . ': conditional end changed');
-                        $this->Schedule(11);
+                        $this->Schedule(10 + self::SCHEDULE_OFF);
                     }
-                }
-                else {
+                } else {
                     $this->SendDebug(__FUNCTION__, $senderID . ' unknown!');
                 }
             break;
         }
-    }
-
-    /**
-     * SwitchState
-     * 
-     *  @param boolean $state ON/OFF.
-     */
-    private function SwitchState($state)
-    {
-        $this->SendDebug(__FUNCTION__, 'New Value: ' . var_export($state, true));
-        // Check shadow Variable
-        if ($this->ReadPropertyBoolean('SettingsSwitch')) {
-            $this->SetValueBoolean('switch_proxy', boolval($state));
-        }
-    }
-
-    /**
-     * Switch Variable/Script
-     * 
-     *  @param boolean $state ON/OFF.
-     */
-    private function SwitchDevice($state)
-    {
-        $ret = true;
-        $this->SendDebug(__FUNCTION__, 'New State: ' . var_export($state, true));
-        // Check Script
-        $ds = $this->ReadPropertyInteger('DeviceScript');
-        if ($ds != 0) {
-            if (IPS_ScriptExists($ds)) {
-                $rs = IPS_RunScriptEx($ds, ['State' => $state]);
-                $this->SendDebug(__FUNCTION__, 'RundScript: ' .$rs);
-            } else {
-                $this->SendDebug(__FUNCTION__, 'Script #' . $ds . ' doesnt exist!');
-            }
-        }
-        // Check Variable
-        $dv = $this->ReadPropertyInteger('DeviceVariable');
-        if ($dv != 0) {
-            $bv =  $this->ReadPropertyBoolean('SettingsBool');
-            if ($bv) {
-                $ret = @SetValueBoolean($dv, boolval($state)); 
-            }
-            else {
-                $ret = @RequestAction($dv, boolval($state)); 
-            }
-            if ($ret === false) {
-                $this->SendDebug(__FUNCTION__, 'Gerät konnte nicht geschalten werden (UNREACH)!');
-                return false;
-            }
-        }
-        return $ret;
     }
 
     /**
@@ -255,8 +205,8 @@ class LightTimer extends IPSModule
         $this->SendDebug(__FUNCTION__, $ident . ' => ' . $value);
         switch ($ident) {
             case 'switch_proxy':
-                if($this->SwitchDevice($value)) {
-                    $this->SetValueBoolean($ident, $value); 
+                if ($this->SwitchDevice($value)) {
+                    $this->SetValueBoolean($ident, $value);
                 }
                 break;
             default:
@@ -265,7 +215,7 @@ class LightTimer extends IPSModule
         return true;
     }
 
-     /**
+    /**
      * This function will be available automatically after the module is imported with the module control.
      * Using the custom prefix this function will be callable from PHP and JSON-RPC through:
      *
@@ -275,7 +225,7 @@ class LightTimer extends IPSModule
     public function CreateSchedule()
     {
         $eid = $this->CreateWeeklySchedule($this->InstanceID, self::SCHEDULE_NAME, self::SCHEDULE_IDENT, self::SCHEDULE_SWITCH, -1);
-        if($eid !== false) {
+        if ($eid !== false) {
             $this->UpdateFormField('TimingSchedule', 'value', $eid);
         }
     }
@@ -292,19 +242,19 @@ class LightTimer extends IPSModule
         // Mode?
         $mode = $this->ReadPropertyInteger('TimingAutomatic');
         $this->SendDebug(__FUNCTION__, 'Mode: ' . $mode);
-        switch($mode) {
+        switch ($mode) {
             case 0: // Time only
                 if (($value == 1) || ($value == 2)) {
                     $this->SendDebug(__FUNCTION__, '0-Switch: ' . var_export($value == 2, true));
-                    if($this->SwitchDevice($value == 2)) {
+                    if ($this->SwitchDevice($value == 2)) {
                         $this->SwitchState($value == 2);
                     }
                 }
                 break;
             case 1: // Morning (Conditionla) / Evening (Time)
                 if (($value == 1) || ($value == 12)) {
-                    $this->SendDebug(__FUNCTION__, '1-Switch: ' . var_export($value == 2, true));
-                    if($this->SwitchDevice($value == 12)) {
+                    $this->SendDebug(__FUNCTION__, '1-Switch: ' . var_export($value == 12, true));
+                    if ($this->SwitchDevice($value == 12)) {
                         $this->SwitchState($value == 12);
                     }
                 }
@@ -312,15 +262,15 @@ class LightTimer extends IPSModule
             case 2: // Morning (Time) / Evening (Conditionla)
                 if (($value == 2) || ($value == 11)) {
                     $this->SendDebug(__FUNCTION__, '2-Switch: ' . var_export($value == 2, true));
-                    if($this->SwitchDevice($value == 2)) {
+                    if ($this->SwitchDevice($value == 2)) {
                         $this->SwitchState($value == 2);
                     }
                 }
                 break;
             case 4: // Morning (Conditionla) / Evening (Conditionla)
                 if (($value == 11) || ($value == 12)) {
-                    $this->SendDebug(__FUNCTION__, '4-Switch: ' . var_export($value == 2, true));
-                    if($this->SwitchDevice($value == 12)) {
+                    $this->SendDebug(__FUNCTION__, '4-Switch: ' . var_export($value == 12, true));
+                    if ($this->SwitchDevice($value == 12)) {
                         $this->SwitchState($value == 12);
                     }
                 }
@@ -332,8 +282,58 @@ class LightTimer extends IPSModule
     }
 
     /**
+     * SwitchState
+     *
+     *  @param boolean $state ON/OFF.
+     */
+    private function SwitchState($state)
+    {
+        $this->SendDebug(__FUNCTION__, 'New Value: ' . var_export($state, true));
+        // Check shadow Variable
+        if ($this->ReadPropertyBoolean('SettingsSwitch')) {
+            $this->SetValueBoolean('switch_proxy', boolval($state));
+        }
+    }
+
+    /**
+     * Switch Variable/Script
+     *
+     *  @param boolean $state ON/OFF.
+     */
+    private function SwitchDevice($state)
+    {
+        $ret = true;
+        $this->SendDebug(__FUNCTION__, 'New State: ' . var_export($state, true));
+        // Check Script
+        $ds = $this->ReadPropertyInteger('DeviceScript');
+        if ($ds != 0) {
+            if (IPS_ScriptExists($ds)) {
+                $rs = IPS_RunScriptEx($ds, ['State' => $state]);
+                $this->SendDebug(__FUNCTION__, 'RundScript: ' . $rs);
+            } else {
+                $this->SendDebug(__FUNCTION__, 'Script #' . $ds . ' doesnt exist!');
+            }
+        }
+        // Check Variable
+        $dv = $this->ReadPropertyInteger('DeviceVariable');
+        if ($dv != 0) {
+            $bv = $this->ReadPropertyBoolean('SettingsBool');
+            if ($bv) {
+                $ret = @SetValueBoolean($dv, boolval($state));
+            } else {
+                $ret = @RequestAction($dv, boolval($state));
+            }
+            if ($ret === false) {
+                $this->SendDebug(__FUNCTION__, 'Gerät konnte nicht geschalten werden (UNREACH)!');
+                return false;
+            }
+        }
+        return $ret;
+    }
+
+    /**
      * Returns the status variablen ID of the Location Control by given ident.
-     * 
+     *
      * @param string   $ident Ident of the Location Control Variable
      * @return integer Variablen ID
      */

@@ -39,7 +39,7 @@
                         {"label": "Astronomic twilight", "value": "AstronomicTwilightEnd"}
                     ]
                 },
-                {"type": "SelectEvent", "name": "TimingSchedule", "caption": "Schedule:",  "width": "450px" }
+                {"type": "SelectEvent", "name": "TimingSchedule", "caption": "Schedule:",  "width": "450px"}
             ]
         },
         {
@@ -55,8 +55,8 @@
             "type": "ExpansionPanel",
             "caption": "Settings ...",
             "items": [
-                {"type": "CheckBox", "name": "SettingsBool", "caption": "Switch variable is only a simple boolean!" },
-                {"type": "CheckBox", "name": "SettingsSwitch", "caption": "Additionally create a normal switch variable (e.g. for WebFront)?" }
+                {"type": "CheckBox", "name": "SettingsBool", "caption": "Switch variable is only a simple boolean!"},
+                {"type": "CheckBox", "name": "SettingsSwitch", "caption": "Additionally create a normal switch variable (e.g. for WebFront)?"}
             ]
         }
     ],

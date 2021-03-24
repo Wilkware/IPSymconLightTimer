@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconLightTimer/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconLightTimer/actions)
 
-Dieses Modul bietet ...
+Dieses Modul ermöglicht das Schalten eines Gerätes (Variable und/oder Skripts) in Abhängigkeit von Uhrzeit und/oder des täglichen Sonnenganges.
 
 ## Inhaltverzeichnis
 
@@ -20,6 +20,31 @@ Dieses Modul bietet ...
 8. [Versionshistorie](#8-versionshistorie)
 
 ### 1. Funktionsumfang
+
+Für eine einfache Zeitschaltung wäre dieses Modul normalerweise nicht notwendig. Die Erstellung einen Wochenplanes oder eines zyklischen Ereignisses ist mit IPS Bordmitteln recht einfach möglich. Interessant wird die Sache erst wenn man bedingtes und zyklisches Schalten verbinden möchte.
+Für eine solche Kombination gibt es eine Reihe von Anwendungsfälle, wie z.B ...
+
+* Rollläden/Jalousien am Morgen zu einer definierten Zeit hochfahren (Arbeitstag unabhängig von Jahreszeit), aber abends zum Sonnenuntergang runterfahren
+* Außenbeleutung bei einsetzender Dunkelheit einschalten, aber pünktlich um Mitternacht wieder ausschalten
+* Haustür Notlicht einsetzenden der Dämmerung Ein- bzw.- Ausschalten
+* oder zur Weihnachtszeit die Beleutung situativ schalten.
+
+Das nur um einige Anregungen sogeben. Wahrscheinlich gibt es da noch einiges mehr an Ideen, welche sich so umsetzen lassen.
+
+* Zeitschaltung (Automatik) anhand 4 verschiedener Modi möglich:
+  1. Aus -> Schaltung direkt über Zeitplan/Wochenplan
+  2. Morgens (Halbautomatik) -> Morgens bedinges Schalten entsprechend eingestelltem Einschaltverhalten, abends zeitliche Schaltung aus Zeitplan
+  3. Abends (Halbautomatik) -> Morgens zeitliches Schalten aus Zeitplan, abends bedinges Schalten entsprechend eingestelltem Auschaltverhalten
+  4. Früh & Abend (Vollautomatik) -> Morgens und abends bedinges Schalten entsprechend eingestelltem Ein- und Auschaltverhalten
+* Zusätzlich bzw. ausschließlich kann ein Script ausgeführt werden.
+* Anlegen und Einbinden eines Wochenplans zum gezielten zeitlichen Ein- bzw. Ausschalten
+* Schaltvariable muss nicht eine Aktionsvariable sein, sondern kann auch einfach eine boolsche Variable sein.
+* Statusvariable als Proxy-Schalter, z.B. für Verwendung im WebFront
+
+Vielleicht noch ein paar Worte zur Verwendung des Wochenplanes. Natürlich kann man bei einer reinen Zeitschaltung mehrere Zyklen an einen Tag vornehemn.
+In Kombination mit der bedingten Schaltung (Halb- bzw. Vollautomatik) ist das wahrscheinlich nur bedingt sinnvoll.  
+Bei einer eingestellten Halbautomatik wird immer nur einer der möglichen Schaltvorgänge genutzt, also nur der Zeitpunkt für das Einschalten oder eben nur der Zeitpunkt für das Ausschalten. Der andere Schaltvorgang wird durch das bedingte Ein bzw. Aus übernommen. Somit machen mehrere Zyklen im Programm keinen Sinn.
+Es gibt halt nur einen Sonnenaufgang bzw. Sonnenuntergang ;-)
 
 ### 2. Voraussetzungen
 
@@ -37,20 +62,38 @@ Dieses Modul bietet ...
 
 __Konfigurationsseite__:
 
+Einstellungsbereich:
+
+> Zeitschaltung ...
+
+Name                  | Beschreibung
+--------------------- | ---------------------------------
+Automatik             | Auswahl des gewünschten Modus (4 Möglichkeiten)
+Bedingtes Einschalten | Auswahl Sonnenaufgang, ziviler, nautischer oder astronomischer Dämmerungsbeginn
+Bedingtes Ausschalten | Auswahl Sonnenuntergang, ziviles, nautisches oder astronomisches Dämmerungsende
+Zeitplan              | Hinterlegung eines zu verwendeneden Wochenplans
+
+> Gerät ...
+
+Name                  | Beschreibung
+--------------------- | ---------------------------------
+Schaltvariable        | Schalt(Aktions-)variable
+Skript                | Auszuführendes Script (Status true/false wird als Array 'State' übergeben)
+
+> Einstellungen ...
+
+Name                  | Beschreibung
+--------------------- | ---------------------------------
+Schaltvariable ist eine reine boolsche Variable! | true/false
+SkrZusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)? | true/false
+
 ### 6. WebFront
 
-Man kann die Statusvariablen direkt im WF verlinken.
+Man kann die Statusvariablen (Schalter, Zeitplan) direkt im WF verlinken.
 
 ### 7. PHP-Befehlsreferenz
 
-```php
-void LTM_Update(int $InstanzID):
-```
-
-Holt entsprechend der Konfiguration die gewählten Daten.  
-Die Funktion liefert keinerlei Rückgabewert.
-
-__Beispiel__: `LTN_Update(12345);`
+Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
 

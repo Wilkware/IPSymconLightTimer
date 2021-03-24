@@ -152,7 +152,6 @@ trait EventHelper
                 foreach ($g['Points'] as $p) {
                     $StartTimeActDaySlot = $p['Start']['Hour'] * 3600 + $p['Start']['Minute'] * 60 + $p['Start']['Second'];
                     $dayEventFound = true;
-
                     if ($searchTimeActDay >= $StartTimeActDaySlot) {
                         if ($actualSlotFound == false) {
                             $actualSlotFound = true;
