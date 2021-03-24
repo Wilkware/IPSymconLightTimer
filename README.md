@@ -52,7 +52,7 @@ Es gibt halt nur einen Sonnenaufgang bzw. Sonnenuntergang ;-)
 
 ### 3. Installation
 
-* Über den Modul Store das Modul Weather Warning installieren.
+* Über den Modul Store das Modul Licht Zeitschaltuhr installieren.
 * Alternativ Über das Modul-Control folgende URL hinzufügen.  
 `https://github.com/Wilkware/IPSymconLightTimer` oder `git://github.com/Wilkware/IPSymconLightTimer.git`
 
@@ -71,21 +71,21 @@ Name                  | Beschreibung
 Automatik             | Auswahl des gewünschten Modus (4 Möglichkeiten)
 Bedingtes Einschalten | Auswahl Sonnenaufgang, ziviler, nautischer oder astronomischer Dämmerungsbeginn
 Bedingtes Ausschalten | Auswahl Sonnenuntergang, ziviles, nautisches oder astronomisches Dämmerungsende
-Zeitplan              | Hinterlegung eines zu verwendeneden Wochenplans
+Zeitplan              | Hinterlegung eines zu verwendenden Wochenplans
 
 > Gerät ...
 
 Name                  | Beschreibung
 --------------------- | ---------------------------------
 Schaltvariable        | Schalt(Aktions-)variable
-Skript                | Auszuführendes Script (Status true/false wird als Array 'State' übergeben)
+Skript                | Auszuführendes Skript (Status true/false wird als Array 'State' übergeben)
 
 > Einstellungen ...
 
 Name                  | Beschreibung
 --------------------- | ---------------------------------
-Schaltvariable ist eine reine boolsche Variable! | true/false
-SkrZusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)? | true/false
+Schaltvariable ist eine reine boolesche Variable! | true/false
+Zusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)? | true/false
 
 ### 6. WebFront
 
