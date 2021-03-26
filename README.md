@@ -65,8 +65,8 @@ Einstellungsbereich:
 
 Name                  | Beschreibung
 --------------------- | ---------------------------------
-Auslöser Einschalten  | Auswahl Aus; Sonnenaufgang und -untergang; ziviler, nautischer oder astronomischer Dämmerung; Wochenplan (An)
-Auslöser Ausschalten  | Auswahl Aus; Sonnenaufgang und -untergang; ziviler, nautischer oder astronomischer Dämmerung; Wochenplan (Aus)
+Auslöser Einschalten  | Auswahlmöglichkeiten: Aus; Sonnenaufgang oder -untergang; zivile, nautische oder astronomische Dämmerung; Wochenplan (An)
+Auslöser Ausschalten  | Auswahlmöglichkeiten: ; Sonnenaufgang oder -untergang; zivile, nautische oder astronomische Dämmerung; Wochenplan (Aus)
 Zeitplan              | Hinterlegung eines zu verwendenden Wochenplans
 
 > Gerät ...
