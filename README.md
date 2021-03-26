@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-5.2-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.0.20210322-orange.svg)](https://github.com/Wilkware/IPSymconWeatherWarning)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.1.20210326-orange.svg)](https://github.com/Wilkware/IPSymconWeatherWarning)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconLightTimer/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconLightTimer/actions)
 
@@ -31,20 +31,17 @@ Für eine solche Kombination gibt es eine Reihe von Anwendungsfälle, wie z.B ..
 
 Das nur um einige Anregungen sogeben. Wahrscheinlich gibt es da noch einiges mehr an Ideen, welche sich so umsetzen lassen.
 
-* Zeitschaltung (Automatik) anhand 4 verschiedener Modi möglich:
-  1. Aus -> Schaltung direkt über Zeitplan/Wochenplan
-  2. Morgens (Halbautomatik) -> Morgens bedinges Schalten entsprechend eingestelltem Einschaltverhalten, abends zeitliche Schaltung aus Zeitplan
-  3. Abends (Halbautomatik) -> Morgens zeitliches Schalten aus Zeitplan, abends bedinges Schalten entsprechend eingestelltem Auschaltverhalten
-  4. Früh & Abend (Vollautomatik) -> Morgens und abends bedinges Schalten entsprechend eingestelltem Ein- und Auschaltverhalten
+* Zeitschaltung anhand verschiedener Einstellmöglichkeiten:
+  1. Aus -> Ein- bzw. Ausschalten wird nicht vollzogen (externer Auslöser)
+  2. Sonnengang -> 8 mögliche Zeitpunkte wählbar (Sonnenaufgang und -untergang; zivile, nautische oder astronomische Dämmerung)
+  3. Wochenplan -> Steuerung über Zeitplan
 * Zusätzlich bzw. ausschließlich kann ein Script ausgeführt werden.
 * Anlegen und Einbinden eines Wochenplans zum gezielten zeitlichen Ein- bzw. Ausschalten
 * Schaltvariable muss nicht eine Aktionsvariable sein, sondern kann auch einfach eine boolsche Variable sein.
 * Statusvariable als Proxy-Schalter, z.B. für Verwendung im WebFront
 
 Vielleicht noch ein paar Worte zur Verwendung des Wochenplanes. Natürlich kann man bei einer reinen Zeitschaltung mehrere Zyklen an einen Tag vornehemn.
-In Kombination mit der bedingten Schaltung (Halb- bzw. Vollautomatik) ist das wahrscheinlich nur bedingt sinnvoll.  
-Bei einer eingestellten Halbautomatik wird immer nur einer der möglichen Schaltvorgänge genutzt, also nur der Zeitpunkt für das Einschalten oder eben nur der Zeitpunkt für das Ausschalten. Der andere Schaltvorgang wird durch das bedingte Ein bzw. Aus übernommen. Somit machen mehrere Zyklen im Programm keinen Sinn.
-Es gibt halt nur einen Sonnenaufgang bzw. Sonnenuntergang ;-)
+In Kombination mit der bedingten Schaltung (Sonnenaufgang, Sonnenuntergang und Dämmerung) ist das wahrscheinlich nicht sinnvoll.  
 
 ### 2. Voraussetzungen
 
@@ -68,9 +65,8 @@ Einstellungsbereich:
 
 Name                  | Beschreibung
 --------------------- | ---------------------------------
-Automatik             | Auswahl des gewünschten Modus (4 Möglichkeiten)
-Bedingtes Einschalten | Auswahl Sonnenaufgang, ziviler, nautischer oder astronomischer Dämmerungsbeginn
-Bedingtes Ausschalten | Auswahl Sonnenuntergang, ziviles, nautisches oder astronomisches Dämmerungsende
+Auslöser Einschalten  | Auswahl Aus; Sonnenaufgang und -untergang; ziviler, nautischer oder astronomischer Dämmerung; Wochenplan (An)
+Auslöser Ausschalten  | Auswahl Aus; Sonnenaufgang und -untergang; ziviler, nautischer oder astronomischer Dämmerung; Wochenplan (Aus)
 Zeitplan              | Hinterlegung eines zu verwendenden Wochenplans
 
 > Gerät ...
@@ -96,6 +92,11 @@ Man kann die Statusvariablen (Schalter, Zeitplan) direkt im WF verlinken.
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v1.1.20210326
+
+* _NEU_: Umstellung auf frei wählbaren Ein- und Ausschaltzeitpunkt
+* _NEU_: Schaltung über Tagesgrenze hinweg möglich
 
 v1.0.20210322
 

@@ -15,28 +15,38 @@
             "type": "ExpansionPanel",
             "caption": "Timing ...",
             "items": [
-                {"type": "Select", "name": "TimingAutomatic", "caption": "Automatic:",  "width": "450px",
+                {"type": "Select", "name": "TimingStart", "caption": "Trigger switch on:",  "width": "450px",
                     "options": [
-                        {"label": "Off", "value": 0},
-                        {"label": "Morning (semi-automatic)", "value": 1},
-                        {"label": "Evening (semi-automatic)", "value": 2},
-                        {"label": "Early & Evening (fully-automatic)", "value": 4}
-                    ]
-                },
-                {"type": "Select", "name": "TimingStart", "caption": "Conditional switch on:",  "width": "450px",
-                    "options": [
+                        {"label": "Off", "value": "Off"},
+                        {"label": "------------------------------", "value": "None"},
+                        {"label": "Astronomic twilight start", "value": "AstronomicTwilightStart"},
+                        {"label": "Nautic twilight start", "value": "NauticTwilightStart"},
+                        {"label": "Civil twilight start", "value": "CivilTwilightStart"},
                         {"label": "Sunrise", "value": "Sunrise"},
-                        {"label": "Civil twilight", "value": "CivilTwilightStart"},
-                        {"label": "Nautic twilight", "value": "NauticTwilightStart"},
-                        {"label": "Astronomic twilight", "value": "AstronomicTwilightStart"}
+                        {"label": "------------------------------", "value": "None"},
+                        {"label": "Sunset", "value": "Sunset"},
+                        {"label": "Civil twilight end", "value": "CivilTwilightEnd"},
+                        {"label": "Nautic twilight end", "value": "NauticTwilightEnd"},
+                        {"label": "Astronomic twilight end", "value": "AstronomicTwilightEnd"},
+                        {"label": "------------------------------", "value": "None"},
+                        {"label": "Weekly schedul [on]", "value": "WeeklySchedulOn"}
                     ]
                 },
-                {"type": "Select", "name": "TimingEnd", "caption": "Conditional switch off:",  "width": "450px",
+                {"type": "Select", "name": "TimingEnd", "caption": "Trigger switch off:",  "width": "450px",
                     "options": [
+                        {"label": "Off", "value": "Off"},
+                        {"label": "------------------------------", "value": "None"},
+                        {"label": "Astronomic twilight start", "value": "AstronomicTwilightStart"},
+                        {"label": "Nautic twilight start", "value": "NauticTwilightStart"},
+                        {"label": "Civil twilight start", "value": "CivilTwilightStart"},
+                        {"label": "Sunrise", "value": "Sunrise"},
+                        {"label": "------------------------------", "value": "None"},
                         {"label": "Sunset", "value": "Sunset"},
-                        {"label": "Civil twilight", "value": "CivilTwilightEnd"},
-                        {"label": "Nautic twilight", "value": "NauticTwilightEnd"},
-                        {"label": "Astronomic twilight", "value": "AstronomicTwilightEnd"}
+                        {"label": "Civil twilight end", "value": "CivilTwilightEnd"},
+                        {"label": "Nautic twilight end", "value": "NauticTwilightEnd"},
+                        {"label": "Astronomic twilight end", "value": "AstronomicTwilightEnd"},
+                        {"label": "------------------------------", "value": "None"},
+                        {"label": "Weekly schedul [off]", "value": "WeeklySchedulOff"}
                     ]
                 },
                 {"type": "SelectEvent", "name": "TimingSchedule", "caption": "Schedule:",  "width": "450px"}
@@ -63,5 +73,13 @@
     "actions": [
         {"type": "Label", "caption": "The button is used to create a weekly program. It is created below the instance. It can then be set to your own requirements and stored as a time switch.\nNOTE: An inactive week program is treated like a non-existent or selected timer!" },
         {"type": "Button", "caption": "ADD SCHEDULE", "onClick": "LTM_CreateSchedule($id);"}
+    ],
+    "status": [
+        {"code": 101, "icon": "inactive", "caption": "Creating instance."},
+        {"code": 102, "icon": "active", "caption": "Instance active."},
+        {"code": 104, "icon": "inactive", "caption": "Instance inactive."},
+        {"code": 201, "icon": "inactive", "caption": "Please select a trigger for switching on!"},
+        {"code": 202, "icon": "inactive", "caption": "Please select a trigger for switching off!"},
+        {"code": 203, "icon": "inactive", "caption": "Please select a differing switch-on and switch-off time!"}
     ]
 }

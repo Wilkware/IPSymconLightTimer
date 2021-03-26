@@ -12,6 +12,13 @@ class LightTimer extends IPSModule
     use EventHelper;
     use DebugHelper;
 
+    // Timing constant
+    const TIMING_ON = 'On';
+    const TIMING_OFF = 'Off';
+    const TIMING_WEEKLYON  = 'WeeklySchedulOn';
+    const TIMING_WEEKLYOFF = 'WeeklySchedulOff';
+    const TIMING_SEPERATOR = 'None';
+
     // Schedule constant
     const SCHEDULE_OFF = 1;
     const SCHEDULE_ON = 2;
@@ -25,30 +32,6 @@ class LightTimer extends IPSModule
     // Location Control
     const LOCATION_GUID = '{45E97A63-F870-408A-B259-2933F7EABF74}';
 
-    // Profil MODE
-    private $assoMODE = [
-        [0, 'Off', '', 0xFF0000],
-        [1, 'Morning (semi-automatic)', '', 0xFFFF00],
-        [2, 'Evening (semi-automatic)', '', 0xFFFF00],
-        [3, 'Early & Evening (fully-automatic)', '', 0x00FF00],
-    ];
-
-    // Profil START
-    private $assoSTART = [
-        [0, 'Sunrise', '', 0x800080],
-        [1, 'Civil twilight', '', 0x800080],
-        [2, 'Nautic twilight', '', 0x800080],
-        [3, 'Astronomic twilight', '', 0x800080],
-    ];
-
-    // Profil END
-    private $assoEND = [
-        [0, 'Sunset', '', 0x800080],
-        [1, 'Civil twilight', '', 0x800080],
-        [2, 'Nautic twilight', '', 0x800080],
-        [3, 'Astronomic twilight', '', 0x800080],
-    ];
-
     /**
      * Create.
      */
@@ -56,15 +39,10 @@ class LightTimer extends IPSModule
     {
         //Never delete this line!
         parent::Create();
-        // Variablen Profile einrichten
-        //$this->RegisterProfile(VARIABLETYPE_INTEGER, 'LTM.Mode', 'Gear', '', '', 0, 0, 0, 0, $this->assoMODE);
-        //$this->RegisterProfile(VARIABLETYPE_INTEGER, 'LTM.Start', 'Sun', '', '', 0, 0, 0, 0, $this->assoSTART);
-        //$this->RegisterProfile(VARIABLETYPE_INTEGER, 'LTM.End', 'Moon', '', '', 0, 0, 0, 0, $this->assoEND);
         // Timming
-        $this->RegisterPropertyInteger('TimingAutomatic', 4);
+        $this->RegisterPropertyInteger('TimingSchedule', 0);
         $this->RegisterPropertyString('TimingStart', 'Sunrise');
         $this->RegisterPropertyString('TimingEnd', 'Sunset');
-        $this->RegisterPropertyInteger('TimingSchedule', 0);
         // Device
         $this->RegisterPropertyInteger('DeviceVariable', 0);
         $this->RegisterPropertyInteger('DeviceScript', 0);
@@ -74,14 +52,6 @@ class LightTimer extends IPSModule
         // Attribute
         $this->RegisterAttributeInteger('ConditionalStart', 0);
         $this->RegisterAttributeInteger('ConditionalEnd', 0);
-        // Variablen erzeugen
-        //$this->RegisterVariableInteger('automatic_mode', $this->Translate('Automatic'), 'LTM.Mode', 0);
-        //$this->RegisterVariableInteger('conditional_start', $this->Translate('Conditional start'), 'LTM.Start', 0);
-        //$this->RegisterVariableInteger('conditional_end', $this->Translate('Conditional end'), 'LTM.End', 0);
-        // Actions
-        //$this->EnableAction('automatic_mode');
-        //$this->EnableAction('conditional_start');
-        //$this->EnableAction('conditional_end');
     }
 
     /**
@@ -110,13 +80,13 @@ class LightTimer extends IPSModule
      */
     public function ApplyChanges()
     {
-        if ($this->ReadPropertyInteger('DeviceVariable') != 0) {
+        if ($this->ReadPropertyInteger('DeviceVariable') > 0) {
             $this->UnregisterMessage($this->ReadPropertyInteger('DeviceVariable'), VM_UPDATE);
         }
-        if ($this->ReadAttributeInteger('ConditionalStart') != 0) {
+        if ($this->ReadAttributeInteger('ConditionalStart') > 0) {
             $this->UnregisterMessage($this->ReadAttributeInteger('ConditionalStart'), VM_UPDATE);
         }
-        if ($this->ReadAttributeInteger('ConditionalEnd') != 0) {
+        if ($this->ReadAttributeInteger('ConditionalEnd') > 0) {
             $this->UnregisterMessage($this->ReadAttributeInteger('ConditionalEnd'), VM_UPDATE);
         }
         //Never delete this line!
@@ -125,31 +95,55 @@ class LightTimer extends IPSModule
         if (IPS_VariableExists($this->ReadPropertyInteger('DeviceVariable'))) {
             $this->RegisterMessage($this->ReadPropertyInteger('DeviceVariable'), VM_UPDATE);
         }
-        // Conditional
-        $am = $this->ReadPropertyInteger('TimingAutomatic');
-        $cs = 0;
-        $ce = 0;
-        // true == (1 oder 4)
-        if (($am & 5) > 0) {
-            $start = $this->ReadPropertyString('TimingStart');
-            $cs = $this->GetLocationID($start);
-            $this->SendDebug(__FUNCTION__, $start . ' = ' . $cs);
+        // Check Seperators
+        $start = $this->ReadPropertyString('TimingStart');
+        if ($start == self::TIMING_SEPERATOR) {
+            $this->SetStatus(201);
+            return;
         }
-        // true == (2 oder 4)
-        if (($am & 6) > 0) {
-            $end = $this->ReadPropertyString('TimingEnd');
+        $end = $this->ReadPropertyString('TimingEnd');
+        if ($end == self::TIMING_SEPERATOR) {
+            $this->SetStatus(202);
+            return;
+        }
+        // Check Start <> End
+        if (($start != self::TIMING_OFF) && ($end != self::TIMING_OFF)) {
+            if ($start == $end) {
+                $this->SetStatus(203);
+                return;
+            }
+        }
+        // Get Start ID
+        if ($start == self::TIMING_OFF) {
+            $cs = -1;
+        }
+        elseif ($start == self::TIMING_WEEKLYON) {
+            $cs =  0;
+        }
+        else {
+            $cs = $this->GetLocationID($start);
+        }
+        // Get End ID
+        if ($end == self::TIMING_OFF) {
+            $ce = -1;
+        }
+        elseif ($end == self::TIMING_WEEKLYOFF) {
+            $ce = 0;
+        }
+        else {
             $ce = $this->GetLocationID($end);
-            $this->SendDebug(__FUNCTION__, $end . ' = ' . $ce);
         }
         // Write
         $this->WriteAttributeInteger('ConditionalStart', $cs);
+        $this->SendDebug(__FUNCTION__, $start . ' = ' . $cs);
         $this->WriteAttributeInteger('ConditionalEnd', $ce);
-        // Start
-        if ($cs != 0) {
+        $this->SendDebug(__FUNCTION__, $end . ' = ' . $ce);
+        // Register Start
+        if ($cs > 0) {
             $this->RegisterMessage($cs, VM_UPDATE);
         }
-        // End
-        if ($ce != 0) {
+        // Register End
+        if ($ce > 0) {
             $this->RegisterMessage($ce, VM_UPDATE);
         }
         // Aditionally Switch
@@ -158,6 +152,7 @@ class LightTimer extends IPSModule
         if ($switch) {
             $this->EnableAction('switch_proxy');
         }
+        $this->SetStatus(102);
     }
 
     /**
@@ -178,13 +173,11 @@ class LightTimer extends IPSModule
                 $endID = $this->ReadAttributeInteger('ConditionalEnd');
                 if (($senderID != $varID) || ($senderID != $startID) || ($senderID != $endID)) {
                     if (($senderID == $varID) && ($data[1] == true)) {
+                        $this->SendDebug(__FUNCTION__, $senderID . ': device variable changed');
                         $this->SwitchState($data[0]);
-                    } elseif (($senderID == $startID) && ($data[1] == true)) {
+                    } elseif ($data[1] == true) {
                         $this->SendDebug(__FUNCTION__, $senderID . ': conditional start changed');
-                        $this->Schedule(10 + self::SCHEDULE_ON);
-                    } elseif (($senderID == $endID) && ($data[1] == true)) {
-                        $this->SendDebug(__FUNCTION__, $senderID . ': conditional end changed');
-                        $this->Schedule(10 + self::SCHEDULE_OFF);
+                        $this->Schedule($senderID);
                     }
                 } else {
                     $this->SendDebug(__FUNCTION__, $senderID . ' unknown!');
@@ -240,44 +233,49 @@ class LightTimer extends IPSModule
     {
         $this->SendDebug(__FUNCTION__, 'Value: ' . $value);
         // Mode?
-        $mode = $this->ReadPropertyInteger('TimingAutomatic');
-        $this->SendDebug(__FUNCTION__, 'Mode: ' . $mode);
-        switch ($mode) {
-            case 0: // Time only
-                if (($value == 1) || ($value == 2)) {
-                    $this->SendDebug(__FUNCTION__, '0-Switch: ' . var_export($value == 2, true));
-                    if ($this->SwitchDevice($value == 2)) {
-                        $this->SwitchState($value == 2);
-                    }
-                }
-                break;
-            case 1: // Morning (Conditionla) / Evening (Time)
-                if (($value == 1) || ($value == 12)) {
-                    $this->SendDebug(__FUNCTION__, '1-Switch: ' . var_export($value == 12, true));
-                    if ($this->SwitchDevice($value == 12)) {
-                        $this->SwitchState($value == 12);
-                    }
-                }
-                break;
-            case 2: // Morning (Time) / Evening (Conditionla)
-                if (($value == 2) || ($value == 11)) {
-                    $this->SendDebug(__FUNCTION__, '2-Switch: ' . var_export($value == 2, true));
-                    if ($this->SwitchDevice($value == 2)) {
-                        $this->SwitchState($value == 2);
-                    }
-                }
-                break;
-            case 4: // Morning (Conditionla) / Evening (Conditionla)
-                if (($value == 11) || ($value == 12)) {
-                    $this->SendDebug(__FUNCTION__, '4-Switch: ' . var_export($value == 12, true));
-                    if ($this->SwitchDevice($value == 12)) {
-                        $this->SwitchState($value == 12);
-                    }
-                }
-                break;
-            default:
-                $this->SendDebug(__FUNCTION__, 'Mode: ' . $mode . ' unknowned!');
-                break;
+        $cs = $this->ReadAttributeInteger('ConditionalStart');
+        $ce = $this->ReadAttributeInteger('ConditionalEnd');
+
+        // Start is OFF
+        if(($cs == -1) && ($value == self::SCHEDULE_ON)) {
+            $this->SendDebug(__FUNCTION__, 'Start Trigger is off');
+            return;
+        }
+        // End is OFF
+        if(($ce == -1) && ($value == self::SCHEDULE_OFF)) {
+            $this->SendDebug(__FUNCTION__, 'End Trigger is off');
+            return;
+        }
+
+        // Start is Timer
+        if(($cs == 0) && ($value == self::SCHEDULE_ON)) {
+            $this->SendDebug(__FUNCTION__, 'Start timer switch');
+            if ($this->SwitchDevice(true)) {
+                $this->SwitchState(true);
+            }
+        }
+        // End is Timer
+        if(($ce == 0) && ($value == self::SCHEDULE_OFF)) {
+            $this->SendDebug(__FUNCTION__, 'End timer switch');
+            if ($this->SwitchDevice(false)) {
+                $this->SwitchState(false);
+            }
+        }
+
+        // Start conditional switching
+        if($cs == $value) {
+            $this->SendDebug(__FUNCTION__, 'Start conditional-Switch: ' . $value);
+            if ($this->SwitchDevice(true)) {
+                $this->SwitchState(true);
+            }
+        }
+
+        // End conditional switching
+        if($ce == $value) {
+            $this->SendDebug(__FUNCTION__, 'End conditional-Switch: ' . $value);
+            if ($this->SwitchDevice(false)) {
+                $this->SwitchState(false);
+            }
         }
     }
 
@@ -341,7 +339,10 @@ class LightTimer extends IPSModule
     {
         $LCs = IPS_GetInstanceListByModuleID(self::LOCATION_GUID);
         if (isset($LCs[0])) {
-            return IPS_GetObjectIDByIdent($ident, $LCs[0]);
+            $id = @IPS_GetObjectIDByIdent($ident, $LCs[0]);
+            if($id != false) {
+                return $id;
+            }
         }
         $this->SendDebug(__FUNCTION__, 'No Location Control found!');
         return 0;
