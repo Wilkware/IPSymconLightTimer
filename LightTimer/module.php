@@ -15,19 +15,17 @@ class LightTimer extends IPSModule
     // Timing constant
     const TIMING_ON = 'On';
     const TIMING_OFF = 'Off';
-    const TIMING_WEEKLYON  = 'WeeklySchedulOn';
+    const TIMING_START = 'TimingStart';
+    const TIMING_END = 'TimingEnd';
+    const TIMING_WEEKLYON = 'WeeklySchedulOn';
     const TIMING_WEEKLYOFF = 'WeeklySchedulOff';
     const TIMING_SEPERATOR = 'None';
 
     // Schedule constant
-    const SCHEDULE_OFF = 1;
-    const SCHEDULE_ON = 2;
-    const SCHEDULE_NAME = 'Zeitplan';
-    const SCHEDULE_IDENT = 'weekly_schedule';
-    const SCHEDULE_SWITCH = [
-        self::SCHEDULE_OFF => ['Off', 0xFF0000, "LTM_Schedule(\$_IPS['TARGET'], \$_IPS['ACTION']);"],
-        self::SCHEDULE_ON  => ['On', 0x00FF00, "LTM_Schedule(\$_IPS['TARGET'], \$_IPS['ACTION']);"],
-    ];
+    const SCHEDULE_ON = 1;
+    const SCHEDULE_OFF = 2;
+    const SCHEDULE_WEEKLY = ['Check', 'Timer', 'Delete', 'Copy'];
+    const SCHEDULE_DAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'So'];
 
     // Location Control
     const LOCATION_GUID = '{45E97A63-F870-408A-B259-2933F7EABF74}';
@@ -40,7 +38,6 @@ class LightTimer extends IPSModule
         //Never delete this line!
         parent::Create();
         // Timming
-        $this->RegisterPropertyInteger('TimingSchedule', 0);
         $this->RegisterPropertyString('TimingStart', 'Sunrise');
         $this->RegisterPropertyString('TimingEnd', 'Sunset');
         // Device
@@ -48,10 +45,22 @@ class LightTimer extends IPSModule
         $this->RegisterPropertyInteger('DeviceScript', 0);
         // Settings
         $this->RegisterPropertyBoolean('SettingsBool', false);
+        $this->RegisterPropertyBoolean('SettingsTime', false);
         $this->RegisterPropertyBoolean('SettingsSwitch', false);
+        // Schedule
+        foreach (self::SCHEDULE_DAYS as $day) {
+            $this->RegisterPropertyBoolean(self::TIMING_START . 'Check' . $day, true);
+            $this->RegisterPropertyBoolean(self::TIMING_END . 'Check' . $day, true);
+            $this->RegisterPropertyString(self::TIMING_START . 'Time' . $day, '{"hour":6,"minute":0,"second":0}');
+            $this->RegisterPropertyString(self::TIMING_END . 'Time' . $day, '{"hour":18,"minute":0,"second":0}');
+        }
         // Attribute
         $this->RegisterAttributeInteger('ConditionalStart', 0);
         $this->RegisterAttributeInteger('ConditionalEnd', 0);
+        $this->RegisterAttributeInteger('ConditionalTime', 0);
+        // Timer
+        $this->RegisterTimer('ScheduleTimerOn', 0, 'LTM_Schedule(' . $this->InstanceID . ',' . self::SCHEDULE_ON . ');');
+        $this->RegisterTimer('ScheduleTimerOff', 0, 'LTM_Schedule(' . $this->InstanceID . ',' . self::SCHEDULE_OFF . ');');
     }
 
     /**
@@ -71,7 +80,23 @@ class LightTimer extends IPSModule
     {
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
-        //$this->SendDebug(__FUNCTION__, $form);
+        // read setup
+        $start = $this->ReadPropertyString('TimingStart');
+        $end = $this->ReadPropertyString('TimingEnd');
+        // activate/deactivate times
+        for ($d = 1; $d <= 7; $d++) {
+            for ($i = 0; $i <= 8; $i++) {
+                if ($form['elements'][2]['items'][$d]['items'][$i]['type'] != 'Label') {
+                    if ($this->StartsWith($form['elements'][2]['items'][$d]['items'][$i]['name'], self::TIMING_START)) {
+                        $form['elements'][2]['items'][$d]['items'][$i]['enabled'] = ($start == self::TIMING_WEEKLYON);
+                    }
+                    if ($this->StartsWith($form['elements'][2]['items'][$d]['items'][$i]['name'], self::TIMING_END)) {
+                        $form['elements'][2]['items'][$d]['items'][$i]['enabled'] = ($end == self::TIMING_WEEKLYOFF);
+                    }
+                }
+            }
+        }
+        // return form
         return json_encode($form);
     }
 
@@ -95,7 +120,7 @@ class LightTimer extends IPSModule
         if (IPS_VariableExists($this->ReadPropertyInteger('DeviceVariable'))) {
             $this->RegisterMessage($this->ReadPropertyInteger('DeviceVariable'), VM_UPDATE);
         }
-        // Check Seperators
+        // Safty Check Seperators
         $start = $this->ReadPropertyString('TimingStart');
         if ($start == self::TIMING_SEPERATOR) {
             $this->SetStatus(201);
@@ -116,21 +141,17 @@ class LightTimer extends IPSModule
         // Get Start ID
         if ($start == self::TIMING_OFF) {
             $cs = -1;
-        }
-        elseif ($start == self::TIMING_WEEKLYON) {
-            $cs =  0;
-        }
-        else {
+        } elseif ($start == self::TIMING_WEEKLYON) {
+            $cs = 0;
+        } else {
             $cs = $this->GetLocationID($start);
         }
         // Get End ID
         if ($end == self::TIMING_OFF) {
             $ce = -1;
-        }
-        elseif ($end == self::TIMING_WEEKLYOFF) {
+        } elseif ($end == self::TIMING_WEEKLYOFF) {
             $ce = 0;
-        }
-        else {
+        } else {
             $ce = $this->GetLocationID($end);
         }
         // Write
@@ -146,12 +167,22 @@ class LightTimer extends IPSModule
         if ($ce > 0) {
             $this->RegisterMessage($ce, VM_UPDATE);
         }
+        // Off before On check
+        $ct = 0;
+        if ($this->ReadPropertyBoolean('SettingsTime')) {
+            $ct = 1;
+        }
+        $this->WriteAttributeInteger('ConditionalTime', $ct);
+        $this->SendDebug(__FUNCTION__, 'ConditionalTime = ' . $ct);
         // Aditionally Switch
         $switch = $this->ReadPropertyBoolean('SettingsSwitch');
         $this->MaintainVariable('switch_proxy', $this->Translate('Switch'), VARIABLETYPE_BOOLEAN, '~Switch', 0, $switch);
         if ($switch) {
             $this->EnableAction('switch_proxy');
         }
+        // Set next Timer
+        $this->CalculateTimer();
+        // All okay
         $this->SetStatus(102);
     }
 
@@ -203,24 +234,9 @@ class LightTimer extends IPSModule
                 }
                 break;
             default:
-                throw new Exception('Invalid Ident');
+                eval('$this->' . $ident . '(\'' . $value . '\');');
         }
         return true;
-    }
-
-    /**
-     * This function will be available automatically after the module is imported with the module control.
-     * Using the custom prefix this function will be callable from PHP and JSON-RPC through:
-     *
-     * TLA_CreateSchedule($id);
-     *
-     */
-    public function CreateSchedule()
-    {
-        $eid = $this->CreateWeeklySchedule($this->InstanceID, self::SCHEDULE_NAME, self::SCHEDULE_IDENT, self::SCHEDULE_SWITCH, -1);
-        if ($eid !== false) {
-            $this->UpdateFormField('TimingSchedule', 'value', $eid);
-        }
     }
 
     /**
@@ -235,48 +251,87 @@ class LightTimer extends IPSModule
         // Mode?
         $cs = $this->ReadAttributeInteger('ConditionalStart');
         $ce = $this->ReadAttributeInteger('ConditionalEnd');
+        $ct = $this->ReadAttributeInteger('ConditionalTime');
+        $this->SendDebug(__FUNCTION__, 'Conditional is :' . $cs . ', ' . $ce . ', ' . $ct);
 
         // Start is OFF
-        if(($cs == -1) && ($value == self::SCHEDULE_ON)) {
+        if (($cs == -1) && ($value == self::SCHEDULE_ON)) {
             $this->SendDebug(__FUNCTION__, 'Start Trigger is off');
             return;
         }
         // End is OFF
-        if(($ce == -1) && ($value == self::SCHEDULE_OFF)) {
+        if (($ce == -1) && ($value == self::SCHEDULE_OFF)) {
             $this->SendDebug(__FUNCTION__, 'End Trigger is off');
             return;
         }
 
         // Start is Timer
-        if(($cs == 0) && ($value == self::SCHEDULE_ON)) {
+        if (($cs == 0) && ($value == self::SCHEDULE_ON)) {
             $this->SendDebug(__FUNCTION__, 'Start timer switch');
-            if ($this->SwitchDevice(true)) {
-                $this->SwitchState(true);
+            // OFF before ON?
+            if ($ct == 2) {
+                $this->SendDebug(__FUNCTION__, 'OFF before ON!!!');
+                $this->WriteAttributeInteger('ConditionalTime', 1);
+            }
+            else {
+                // Everything okay - switch ON
+                if ($this->SwitchDevice(true)) {
+                    $this->SwitchState(true);
+                }
             }
         }
         // End is Timer
-        if(($ce == 0) && ($value == self::SCHEDULE_OFF)) {
+        if (($ce == 0) && ($value == self::SCHEDULE_OFF)) {
             $this->SendDebug(__FUNCTION__, 'End timer switch');
             if ($this->SwitchDevice(false)) {
                 $this->SwitchState(false);
             }
+            // Check is ON behind OFF
+            if(($ct == 1) && ($cs > 0)) {
+                $mid = mktime(24,0,0);
+                $int = GetValue($cs);
+                $this->SendDebug(__FUNCTION__, 'Check is ON behind OFF: ' . $mid . ' , ' . $int);
+                if($int < $mid) {
+                    $this->SendDebug(__FUNCTION__, 'ON is behind OFF: ' . $int);
+                    $this->WriteAttributeInteger('ConditionalTime', 2);
+                }
+            }
         }
 
         // Start conditional switching
-        if($cs == $value) {
+        if ($cs == $value) {
             $this->SendDebug(__FUNCTION__, 'Start conditional-Switch: ' . $value);
-            if ($this->SwitchDevice(true)) {
-                $this->SwitchState(true);
+            // OFF before ON?
+            if ($ct == 2) {
+                $this->SendDebug(__FUNCTION__, 'OFF before ON!!!');
+                $this->WriteAttributeInteger('ConditionalTime', 1);
+            }
+            else {
+                // Everything okay - switch ON
+                if ($this->SwitchDevice(true)) {
+                    $this->SwitchState(true);
+                }
             }
         }
 
         // End conditional switching
-        if($ce == $value) {
+        if ($ce == $value) {
             $this->SendDebug(__FUNCTION__, 'End conditional-Switch: ' . $value);
             if ($this->SwitchDevice(false)) {
                 $this->SwitchState(false);
             }
+            // Check is ON behind OFF
+            if(($ct == 1) && ($cs == 0)) {
+                $mid = mktime(24,0,0);
+                $int = time() + ($this->GetTimerInterval('ScheduleTimerOn') / 1000);
+                $this->SendDebug(__FUNCTION__, 'Check is ON behind OFF: ' . $mid . ' , ' . $int);
+                if($int < $mid) {
+                    $this->SendDebug(__FUNCTION__, 'ON is behind OFF: ' . $int);
+                    $this->WriteAttributeInteger('ConditionalTime', 2);
+                }
+            }
         }
+        $this->CalculateTimer();
     }
 
     /**
@@ -322,7 +377,7 @@ class LightTimer extends IPSModule
                 $ret = @RequestAction($dv, boolval($state));
             }
             if ($ret === false) {
-                $this->SendDebug(__FUNCTION__, 'Gerät konnte nicht geschalten werden (UNREACH)!');
+                $this->SendDebug(__FUNCTION__, 'Device could not be switched (UNREACH)!');
                 return false;
             }
         }
@@ -340,12 +395,209 @@ class LightTimer extends IPSModule
         $LCs = IPS_GetInstanceListByModuleID(self::LOCATION_GUID);
         if (isset($LCs[0])) {
             $id = @IPS_GetObjectIDByIdent($ident, $LCs[0]);
-            if($id != false) {
+            if ($id != false) {
                 return $id;
             }
         }
         $this->SendDebug(__FUNCTION__, 'No Location Control found!');
         return 0;
+    }
+
+    /**
+     * Activate or deactivate weekly schedule elements.
+     *
+     * @param string   $ident Ident of the trigger
+     * @return bool    True for activate
+     */
+    private function WeeklySchedule($ident, $active)
+    {
+        $this->SendDebug(__FUNCTION__, $ident . ': ' . var_export($active, true));
+        foreach (self::SCHEDULE_DAYS as $day) {
+            $this->UpdateFormField($ident . 'Check' . $day, 'enabled', $active);
+            $this->UpdateFormField($ident . 'Time' . $day, 'enabled', $active);
+            $this->UpdateFormField($ident . 'Delete' . $day, 'enabled', $active);
+            if ($day != 'So') {
+                $this->UpdateFormField($ident . 'Copy' . $day, 'enabled', $active);
+            }
+        }
+    }
+
+    /**
+     * Calculate the next Timer
+     *
+     */
+    private function CalculateTimer()
+    {
+        // read setup
+        $start = $this->ReadPropertyString('TimingStart');
+        $end = $this->ReadPropertyString('TimingEnd');
+        $this->SendDebug(__FUNCTION__, 'Start: ' . $start . ' End: ' . $end);
+        // Disable Timer
+        $this->SetTimerInterval('ScheduleTimerOn', 0);
+        $this->SetTimerInterval('ScheduleTimerOff', 0);
+        // New Timer
+        $day = date('N', time()) - 1;
+        $now = time();
+        $add = 0;
+        if ($start == self::TIMING_WEEKLYON) {
+            $active = false;
+            for ($i = $day; $i <= 6; $i++) {
+                $active = $this->ReadPropertyBoolean('TimingStartCheck' . self::SCHEDULE_DAYS[$i]);
+                if ($active) {
+                    $time = $this->ReadPropertyString('TimingStartTime' . self::SCHEDULE_DAYS[$i]);
+                    $time = json_decode($time, true);
+                    $next = mktime($time['hour'], $time['minute'], $time['second']) + ($add * 86400);
+                    if ($next > $now) {
+                        $diff = $next - $now;
+                        $interval = $diff * 1000;
+                        $this->SetTimerInterval('ScheduleTimerOn', $interval);
+                        break;
+                    } else {
+                        $active = false;
+                    }
+                }
+                $add++;
+            }
+            // if no day behind active, thern look before
+            if (!$active) {
+                for ($i = 0; $i < $day; $i++) {
+                    $active = $this->ReadPropertyBoolean('TimingStartCheck' . self::SCHEDULE_DAYS[$i]);
+                    if ($active) {
+                        $time = $this->ReadPropertyString('TimingStartTime' . self::SCHEDULE_DAYS[$i]);
+                        $time = json_decode($time, true);
+                        $next = mktime($time['hour'], $time['minute'], $time['second']) + ($add * 86400);
+                        if ($next > $now) {
+                            $diff = $next - $now;
+                            $interval = $diff * 1000;
+                            $this->SetTimerInterval('ScheduleTimerOn', $interval);
+                            break;
+                        } else {
+                            $active = false;
+                        }
+                    }
+                    $add++;
+                }
+            }
+        }
+        $add = 0;
+        if ($end == self::TIMING_WEEKLYOFF) {
+            $active = false;
+            for ($i = $day; $i <= 6; $i++) {
+                $active = $this->ReadPropertyBoolean('TimingEndCheck' . self::SCHEDULE_DAYS[$i]);
+                if ($active) {
+                    $time = $this->ReadPropertyString('TimingEndTime' . self::SCHEDULE_DAYS[$i]);
+                    $time = json_decode($time, true);
+                    $next = mktime($time['hour'], $time['minute'], $time['second']) + ($add * 86400);
+                    if ($next > $now) {
+                        $diff = $next - $now;
+                        $interval = $diff * 1000;
+                        $this->SetTimerInterval('ScheduleTimerOff', $interval);
+                        break;
+                    } else {
+                        $active = false;
+                    }
+                }
+                $add++;
+            }
+            // if no day behind active, thern look before
+            if (!$active) {
+                for ($i = 0; $i < $day; $i++) {
+                    $active = $this->ReadPropertyBoolean('TimingEndCheck' . self::SCHEDULE_DAYS[$i]);
+                    if ($active) {
+                        $time = $this->ReadPropertyString('TimingEndTime' . self::SCHEDULE_DAYS[$i]);
+                        $time = json_decode($time, true);
+                        $next = mktime($time['hour'], $time['minute'], $time['second']) + ($add * 86400);
+                        if ($next > $now) {
+                            $diff = $next - $now;
+                            $interval = $diff * 1000;
+                            $this->SetTimerInterval('ScheduleTimerOff', $interval);
+                            break;
+                        } else {
+                            $active = false;
+                        }
+                    }
+                    $add++;
+                }
+            }
+        }
+    }
+
+    /**
+     * User has select an new start trigger.
+     *
+     * @param string $id select ID.
+     */
+    private function OnTimingStart($id)
+    {
+        $this->SendDebug(__FUNCTION__, 'Ident: ' . $id);
+        if ($id == self::TIMING_SEPERATOR) {
+            $this->UpdateFormField(self::TIMING_START, 'value', self::TIMING_OFF);
+        }
+        $this->WeeklySchedule(self::TIMING_START, ($id == self::TIMING_WEEKLYON));
+    }
+
+    /**
+     * User has select an new end trigger.
+     *
+     * @param string $id select ID.
+     */
+    private function OnTimingEnd($id)
+    {
+        $this->SendDebug(__FUNCTION__, 'Ident: ' . $id);
+        if ($id == self::TIMING_SEPERATOR) {
+            $this->UpdateFormField(self::TIMING_END, 'value', self::TIMING_OFF);
+        }
+        $this->WeeklySchedule(self::TIMING_END, ($id == self::TIMING_WEEKLYOFF));
+    }
+
+    /**
+     * User has clickt on delete button.
+     *
+     * @param string $id button ID.
+     */
+    private function OnStartDelete($id)
+    {
+        $this->SendDebug(__FUNCTION__, 'Ident: ' . $id);
+        $this->UpdateFormField($id, 'value', '{"hour":6,"minute":0,"second":0}');
+    }
+
+    /**
+     * User has clickt on delete button.
+     *
+     * @param string $id button ID.
+     */
+    private function OnEndDelete($id)
+    {
+        $this->SendDebug(__FUNCTION__, 'Ident: ' . $id);
+        $this->UpdateFormField($id, 'value', '{"hour":18,"minute":0,"second":0}');
+    }
+
+    /**
+     * User has clickt on copy button.
+     *
+     * @param string $value copy value.
+     */
+    private function OnStartCopy($value)
+    {
+        $this->SendDebug(__FUNCTION__, 'Value: ' . $value);
+        $day = substr($value, 0, 2);
+        $time = substr($value, 2);
+        $this->SendDebug(__FUNCTION__, 'Day: ' . $day . ' Time: ' . $time);
+        $this->UpdateFormField(self::TIMING_START . 'Time' . $day, 'value', $time);
+    }
+
+    /**
+     * User has clickt on copy button.
+     *
+     * @param string $value copy value..
+     */
+    private function OnEndCopy($value)
+    {
+        $this->SendDebug(__FUNCTION__, 'Value: ' . $value);
+        $day = substr($value, 0, 2);
+        $time = substr($value, 2);
+        $this->SendDebug(__FUNCTION__, 'Day: ' . $day . ' Time: ' . $time);
+        $this->UpdateFormField(self::TIMING_END . 'Time' . $day, 'value', $time);
     }
 
     /**
@@ -382,5 +634,16 @@ class LightTimer extends IPSModule
     {
         $id = $this->GetIDForIdent($ident);
         SetValueInteger($id, $value);
+    }
+
+    /**
+     * Checks if a string starts with a given substring
+     *
+     * @param string $haystack The string to search in.
+     * @param int    $needle The substring to search for in the haystack.
+     */
+    private function StartsWith(string $haystack, string $needle)
+    {
+        return (string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0;
     }
 }

@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-5.2-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.1.20210326-orange.svg)](https://github.com/Wilkware/IPSymconWeatherWarning)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.2.20210330-orange.svg)](https://github.com/Wilkware/IPSymconWeatherWarning)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconLightTimer/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconLightTimer/actions)
 
@@ -32,16 +32,14 @@ Für eine solche Kombination gibt es eine Reihe von Anwendungsfälle, wie z.B ..
 Das nur um einige Anregungen sogeben. Wahrscheinlich gibt es da noch einiges mehr an Ideen, welche sich so umsetzen lassen.
 
 * Zeitschaltung anhand verschiedener Einstellmöglichkeiten:
-  1. Aus -> Ein- bzw. Ausschalten wird nicht vollzogen (externer Auslöser)
-  2. Sonnengang -> 8 mögliche Zeitpunkte wählbar (Sonnenaufgang und -untergang; zivile, nautische oder astronomische Dämmerung)
-  3. Wochenplan -> Steuerung über Zeitplan
+  1. Aus => Ein- bzw. Ausschalten wird nicht vollzogen (externer Auslöser)
+  2. Sonnengang => 8 mögliche Zeitpunkte wählbar (Sonnenaufgang und -untergang; zivile, nautische oder astronomische Dämmerung)
+  3. Wochenplan => Steuerung über Zeitplan
 * Zusätzlich bzw. ausschließlich kann ein Script ausgeführt werden.
-* Anlegen und Einbinden eines Wochenplans zum gezielten zeitlichen Ein- bzw. Ausschalten
 * Schaltvariable muss nicht eine Aktionsvariable sein, sondern kann auch einfach eine boolsche Variable sein.
-* Statusvariable als Proxy-Schalter, z.B. für Verwendung im WebFront
-
-Vielleicht noch ein paar Worte zur Verwendung des Wochenplanes. Natürlich kann man bei einer reinen Zeitschaltung mehrere Zyklen an einen Tag vornehemn.
-In Kombination mit der bedingten Schaltung (Sonnenaufgang, Sonnenuntergang und Dämmerung) ist das wahrscheinlich nicht sinnvoll.  
+* Option das Einschalten nur zu erlauben, wenn sich die Zeiten nicht überschneiden (zeitlich korrekte Abfolge, AN-vor-AUS).
+* Statusvariable als Proxy-Schalter, z.B. für Verwendung im WebFront.
+* Schalten kann über mehrere Tage hinweg organisiert werden (gezielter Einsatz des täglichen Zeitplanes).
 
 ### 2. Voraussetzungen
 
@@ -67,7 +65,7 @@ Name                  | Beschreibung
 --------------------- | ---------------------------------
 Auslöser Einschalten  | Auswahlmöglichkeiten: Aus; Sonnenaufgang oder -untergang; zivile, nautische oder astronomische Dämmerung; Wochenplan (An)
 Auslöser Ausschalten  | Auswahlmöglichkeiten: ; Sonnenaufgang oder -untergang; zivile, nautische oder astronomische Dämmerung; Wochenplan (Aus)
-Zeitplan              | Hinterlegung eines zu verwendenden Wochenplans
+(Zeitplan)            | Hinterlegung einer täglichen Uhrzeit für AN & AUS (Montag - Sonntag)
 
 > Gerät ...
 
@@ -81,17 +79,23 @@ Skript                | Auszuführendes Skript (Status true/false wird als Array
 Name                  | Beschreibung
 --------------------- | ---------------------------------
 Schaltvariable ist eine reine boolesche Variable! | true/false
+Schaltvariable nur ein- bzw. ausschalten wenn zeitliche Abfolge korrekt ist (nur in Verbindung mit einem Wochenplan)! | true/false
 Zusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)? | true/false
 
 ### 6. WebFront
 
-Man kann die Statusvariablen (Schalter, Zeitplan) direkt im WF verlinken.
+Man kann die Statusvariable (Schalter) direkt im WF verlinken.
 
 ### 7. PHP-Befehlsreferenz
 
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v1.2.20210330
+
+* _FIX_: Umstellung auf direkte Eingabe der Uhrzeiten (kein externer Wochenplan mehr notwendig)
+* _NEU_: Beachtung der zeitlichen Reihenfolge (EIN-vor-AUS) hinzugefügt
 
 v1.1.20210326
 
@@ -114,4 +118,4 @@ Die Software ist für die nicht kommerzielle Nutzung kostenlos, Schenkungen als 
 
 ### Lizenz
 
-[![Licence](https://licensebuttons.net/i/l/by-nc-sa/transparent/00/00/00/88x31-e.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Licence](https://licensebuttons.net/i/l/by-nc-sa/transparent/ff/66/00/88x31-e.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
