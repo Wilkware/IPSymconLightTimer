@@ -256,11 +256,13 @@ class LightTimer extends IPSModule
 
         // Start is OFF
         if (($cs == -1) && ($value == self::SCHEDULE_ON)) {
+            // never happend!!!!
             $this->SendDebug(__FUNCTION__, 'Start Trigger is off');
             return;
         }
         // End is OFF
         if (($ce == -1) && ($value == self::SCHEDULE_OFF)) {
+            // never happend!!!!
             $this->SendDebug(__FUNCTION__, 'End Trigger is off');
             return;
         }
@@ -286,15 +288,10 @@ class LightTimer extends IPSModule
             if ($this->SwitchDevice(false)) {
                 $this->SwitchState(false);
             }
-            // Check is ON behind OFF
-            if(($ct == 1) && ($cs > 0)) {
-                $mid = mktime(24,0,0);
-                $int = GetValue($cs);
-                $this->SendDebug(__FUNCTION__, 'Check is ON behind OFF: ' . $mid . ' , ' . $int);
-                if($int < $mid) {
-                    $this->SendDebug(__FUNCTION__, 'ON is behind OFF: ' . $int);
-                    $this->WriteAttributeInteger('ConditionalTime', 2);
-                }
+            // Prevent ON behind OFF
+            if($ct > 0) {
+                $this->SendDebug(__FUNCTION__, 'Prevent ON behind OFF (2)!');
+                $this->WriteAttributeInteger('ConditionalTime', 2);
             }
         }
 
@@ -320,15 +317,10 @@ class LightTimer extends IPSModule
             if ($this->SwitchDevice(false)) {
                 $this->SwitchState(false);
             }
-            // Check is ON behind OFF
-            if(($ct == 1) && ($cs == 0)) {
-                $mid = mktime(24,0,0);
-                $int = time() + ($this->GetTimerInterval('ScheduleTimerOn') / 1000);
-                $this->SendDebug(__FUNCTION__, 'Check is ON behind OFF: ' . $mid . ' , ' . $int);
-                if($int < $mid) {
-                    $this->SendDebug(__FUNCTION__, 'ON is behind OFF: ' . $int);
-                    $this->WriteAttributeInteger('ConditionalTime', 2);
-                }
+            // Prevent ON behind OFF
+            if($ct > 0) {
+                $this->SendDebug(__FUNCTION__, 'Prevent ON is behind OFF (2)!');
+                $this->WriteAttributeInteger('ConditionalTime', 2);
             }
         }
         $this->CalculateTimer();
