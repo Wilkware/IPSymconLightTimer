@@ -34,7 +34,7 @@
       "Script:": "Skript:",
       "Settings ...": "Einstellungen ...",
       "Switch variable is only a simple boolean!": "Schaltvariable ist eine reine boolsche Variable!",
-      "Switch variable only on or off if time sequence is correct (only if weekly schedule is included)!": "Schaltvariable nur ein- bzw. ausschalten wenn zeitliche Abfolge korrekt ist (nur in Verbindung mit einem Wochenplan)!",
+      "Switch variable only on or off if time sequence within a day is correct (only if weekly schedule is included)!": "Schaltvariable nur ein- bzw. ausschalten wenn zeitliche Abfolge innerhalb eines Tages korrekt ist (nur in Verbindung mit einem Wochenplan)!",
       "Additionally create a normal switch variable (e.g. for WebFront)?": "Zusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)?",
       "Creating instance.": "Die Instanz wird erstellt.",
       "Instance active.": "Instanz ist aktiv.",

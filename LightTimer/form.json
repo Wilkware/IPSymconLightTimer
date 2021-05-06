@@ -145,12 +145,12 @@
                         {"type": "CheckBox", "name": "TimingStartCheckSo", "caption": "So: ", "value": true, "width": "75px"},
                         {"type": "SelectTime", "name": "TimingStartTimeSo", "caption": "Uhrzeit:",  "width": "175px"},
                         {"type": "Button", "name": "TimingStartDeleteSo", "caption": "⭙", "width": "75px", "onClick": "IPS_RequestAction($id,'OnStartDelete','TimingStartTimeSo');"},
-                        {"type": "Label", "label": "", "width": "75px"},
+                        {"type": "Button", "name": "TimingStartCopySo", "caption": "↓", "width": "75px", "onClick": "IPS_RequestAction($id,'OnStartCopy','Mo' . $TimingStartTimeSo);"},
                         {"type": "Label", "label": "   |   \n   |   "},
                         {"type": "CheckBox", "name": "TimingEndCheckSo", "caption": "So: ", "value": true, "width": "75px"},
                         {"type": "SelectTime", "name": "TimingEndTimeSo", "caption": "Uhrzeit:",  "width": "175px"},
                         {"type": "Button", "name": "TimingEndDeleteSo", "caption": "⭙", "width": "75px", "onClick": "IPS_RequestAction($id,'OnEndDelete','TimingEndTimeSo');"},
-                        {"type": "Label", "label": "", "width": "75px"}
+                        {"type": "Button", "name": "TimingEndCopySo", "caption": "↓", "width": "75px", "onClick": "IPS_RequestAction($id,'OnEndCopy','Mo' . $TimingEndTimeSo);"}
                     ]
                 }
             ]
@@ -169,7 +169,7 @@
             "caption": "Settings ...",
             "items": [
                 {"type": "CheckBox", "name": "SettingsBool", "caption": "Switch variable is only a simple boolean!"},
-                {"type": "CheckBox", "name": "SettingsTime", "caption": "Switch variable only on or off if time sequence is correct (only if weekly schedule is included)!"},
+                {"type": "CheckBox", "name": "SettingsTime", "caption": "Switch variable only on or off if time sequence within a day is correct (only if weekly schedule is included)!"},
                 {"type": "CheckBox", "name": "SettingsSwitch", "caption": "Additionally create a normal switch variable (e.g. for WebFront)?"}
             ]
         }
