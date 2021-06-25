@@ -271,17 +271,17 @@ class LightTimer extends IPSModule
         if (($cs == 0) && ($value == self::SCHEDULE_ON)) {
             $this->SendDebug(__FUNCTION__, 'Start timer switch');
             $switch = true;
-            // Check was OFF before ON (only for conditional timing setup)
-            if ($ct > 0) {
-                $mid = mktime(24,0,0);
+            // Check was OFF before ON (only for conditional timing setup, means ce is set)
+            if ($ct > 0 && $ce > 0) {
+                $mid = mktime(24, 0, 0);
                 $int = GetValue($ce);
                 $this->SendDebug(__FUNCTION__, 'Check was OFF before ON: ' . $mid . ' < ' . $int);
-                if($mid < $int) {
+                if ($mid < $int) {
                     $this->SendDebug(__FUNCTION__, 'OFF wass before ON: ' . boolval($mid < $int));
                     $switch = false;
                 }
             }
-            if($switch) {
+            if ($switch) {
                 // Everything okay - switch ON
                 if ($this->SwitchDevice(true)) {
                     $this->SwitchState(true);
@@ -299,19 +299,19 @@ class LightTimer extends IPSModule
         if ($cs == $value) {
             $this->SendDebug(__FUNCTION__, 'Start conditional-Switch: ' . $value);
             $switch = true;
-            // Check was OFF before ON (only for conditional timing setup)
-            if ($ct > 0) {
+            // Check was OFF before ON (only for conditional timing setup; means ce is clock(0))
+            if ($ct > 0 && $ce == 0) {
                 $buf = $this->GetBuffer('schedule');
                 $lts = explode(':', $buf);
-                $mid = mktime(24,0,0);
+                $mid = mktime(24, 0, 0);
                 $int = $lts[1];
                 $this->SendDebug(__FUNCTION__, 'Check was OFF before ON: ' . $mid . ' < ' . $int);
-                if($mid < $int) {
+                if ($mid < $int) {
                     $this->SendDebug(__FUNCTION__, 'OFF was before ON: ' . boolval($mid < $int));
                     $switch = false;
                 }
             }
-            if($switch) {
+            if ($switch) {
                 // Everything okay - switch ON
                 if ($this->SwitchDevice(true)) {
                     $this->SwitchState(true);
@@ -463,7 +463,7 @@ class LightTimer extends IPSModule
                         $next = mktime($time['hour'], $time['minute'], $time['second']) + ($add * 86400);
                         if ($next > $now) {
                             $ts = $next - $now;
-                            $this->SetTimerInterval('ScheduleTimerOn', $ts*1000);
+                            $this->SetTimerInterval('ScheduleTimerOn', $ts * 1000);
                             break;
                         } else {
                             $active = false;
@@ -484,7 +484,7 @@ class LightTimer extends IPSModule
                     $next = mktime($time['hour'], $time['minute'], $time['second']) + ($add * 86400);
                     if ($next > $now) {
                         $te = $next - $now;
-                        $this->SetTimerInterval('ScheduleTimerOff', $te*1000);
+                        $this->SetTimerInterval('ScheduleTimerOff', $te * 1000);
                         break;
                     } else {
                         $active = false;
@@ -502,7 +502,7 @@ class LightTimer extends IPSModule
                         $next = mktime($time['hour'], $time['minute'], $time['second']) + ($add * 86400);
                         if ($next > $now) {
                             $te = $next - $now;
-                            $this->SetTimerInterval('ScheduleTimerOff', $interval*1000);
+                            $this->SetTimerInterval('ScheduleTimerOff', $te * 1000);
                             break;
                         } else {
                             $active = false;
@@ -512,7 +512,7 @@ class LightTimer extends IPSModule
                 }
             }
         }
-        $this->SetBuffer('schedule', ($ts>0?$ts+$now:0) . ':' . ($te>0?$te+$now:0));
+        $this->SetBuffer('schedule', ($ts > 0 ? $ts + $now : 0) . ':' . ($te > 0 ? $te + $now : 0));
         $this->SendDebug(__FUNCTION__, 'Buffer: ' . $this->GetBuffer('schedule'));
     }
 
