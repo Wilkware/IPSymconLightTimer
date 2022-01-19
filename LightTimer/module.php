@@ -13,22 +13,22 @@ class LightTimer extends IPSModule
     use DebugHelper;
 
     // Timing constant
-    const TIMING_ON = 'On';
-    const TIMING_OFF = 'Off';
-    const TIMING_START = 'TimingStart';
-    const TIMING_END = 'TimingEnd';
-    const TIMING_WEEKLYON = 'WeeklySchedulOn';
-    const TIMING_WEEKLYOFF = 'WeeklySchedulOff';
-    const TIMING_SEPERATOR = 'None';
+    private const TIMING_ON = 'On';
+    private const TIMING_OFF = 'Off';
+    private const TIMING_START = 'TimingStart';
+    private const TIMING_END = 'TimingEnd';
+    private const TIMING_WEEKLYON = 'WeeklySchedulOn';
+    private const TIMING_WEEKLYOFF = 'WeeklySchedulOff';
+    private const TIMING_SEPERATOR = 'None';
 
     // Schedule constant
-    const SCHEDULE_ON = 1;
-    const SCHEDULE_OFF = 2;
-    const SCHEDULE_WEEKLY = ['Check', 'Timer', 'Delete', 'Copy'];
-    const SCHEDULE_DAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'So'];
+    private const SCHEDULE_ON = 1;
+    private const SCHEDULE_OFF = 2;
+    private const SCHEDULE_WEEKLY = ['Check', 'Timer', 'Delete', 'Copy'];
+    private const SCHEDULE_DAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'So'];
 
     // Location Control
-    const LOCATION_GUID = '{45E97A63-F870-408A-B259-2933F7EABF74}';
+    private const LOCATION_GUID = '{45E97A63-F870-408A-B259-2933F7EABF74}';
 
     /**
      * Create.
@@ -37,6 +37,8 @@ class LightTimer extends IPSModule
     {
         //Never delete this line!
         parent::Create();
+        // Instance
+        $this->RegisterPropertyBoolean('InstanceInactive', false);
         // Timming
         $this->RegisterPropertyString('TimingStart', 'Sunrise');
         $this->RegisterPropertyString('TimingEnd', 'Sunset');
@@ -86,12 +88,12 @@ class LightTimer extends IPSModule
         // activate/deactivate times
         for ($d = 1; $d <= 7; $d++) {
             for ($i = 0; $i <= 8; $i++) {
-                if ($form['elements'][2]['items'][$d]['items'][$i]['type'] != 'Label') {
-                    if ($this->StartsWith($form['elements'][2]['items'][$d]['items'][$i]['name'], self::TIMING_START)) {
-                        $form['elements'][2]['items'][$d]['items'][$i]['enabled'] = ($start == self::TIMING_WEEKLYON);
+                if ($form['elements'][3]['items'][$d]['items'][$i]['type'] != 'Label') {
+                    if ($this->StartsWith($form['elements'][3]['items'][$d]['items'][$i]['name'], self::TIMING_START)) {
+                        $form['elements'][3]['items'][$d]['items'][$i]['enabled'] = ($start == self::TIMING_WEEKLYON);
                     }
-                    if ($this->StartsWith($form['elements'][2]['items'][$d]['items'][$i]['name'], self::TIMING_END)) {
-                        $form['elements'][2]['items'][$d]['items'][$i]['enabled'] = ($end == self::TIMING_WEEKLYOFF);
+                    if ($this->StartsWith($form['elements'][3]['items'][$d]['items'][$i]['name'], self::TIMING_END)) {
+                        $form['elements'][3]['items'][$d]['items'][$i]['enabled'] = ($end == self::TIMING_WEEKLYOFF);
                     }
                 }
             }
@@ -105,6 +107,10 @@ class LightTimer extends IPSModule
      */
     public function ApplyChanges()
     {
+        // Disable Timer
+        $this->SetTimerInterval('ScheduleTimerOn', 0);
+        $this->SetTimerInterval('ScheduleTimerOff', 0);
+        // Register Message
         if ($this->ReadPropertyInteger('DeviceVariable') > 0) {
             $this->UnregisterMessage($this->ReadPropertyInteger('DeviceVariable'), VM_UPDATE);
         }
@@ -119,6 +125,12 @@ class LightTimer extends IPSModule
         //Create our trigger
         if (IPS_VariableExists($this->ReadPropertyInteger('DeviceVariable'))) {
             $this->RegisterMessage($this->ReadPropertyInteger('DeviceVariable'), VM_UPDATE);
+        }
+        // On/Off Check
+        $inactive = $this->ReadPropertyBoolean('InstanceInactive');
+        if ($inactive) {
+            $this->SetStatus(104);
+            return;
         }
         // Safty Check Seperators
         $start = $this->ReadPropertyString('TimingStart');
@@ -592,42 +604,6 @@ class LightTimer extends IPSModule
         $time = substr($value, 2);
         $this->SendDebug(__FUNCTION__, 'Day: ' . $day . ' Time: ' . $time);
         $this->UpdateFormField(self::TIMING_END . 'Time' . $day, 'value', $time);
-    }
-
-    /**
-     * Update a boolean value.
-     *
-     * @param string $ident Ident of the boolean variable
-     * @param bool   $value Value of the boolean variable
-     */
-    private function SetValueBoolean(string $ident, bool $value)
-    {
-        $id = $this->GetIDForIdent($ident);
-        SetValueBoolean($id, $value);
-    }
-
-    /**
-     * Update a string value.
-     *
-     * @param string $ident Ident of the string variable
-     * @param string $value Value of the string variable
-     */
-    private function SetValueString(string $ident, string $value)
-    {
-        $id = $this->GetIDForIdent($ident);
-        SetValueString($id, $value);
-    }
-
-    /**
-     * Update a integer value.
-     *
-     * @param string $ident Ident of the integer variable
-     * @param int    $value Value of the integer variable
-     */
-    private function SetValueInteger(string $ident, int $value)
-    {
-        $id = $this->GetIDForIdent($ident);
-        SetValueInteger($id, $value);
     }
 
     /**

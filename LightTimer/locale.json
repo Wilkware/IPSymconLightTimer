@@ -2,9 +2,10 @@
   "translations": {
     "de": {
       "\nLight Timer\n ": "\nLicht - Zeitschaltuhr\n ",
-      "This module enables switching of a device depending on time and/or daily twilight.": "Dieses Modul ermöglicht das Schalten eines Gerätes in Abhängigkeit von Uhrzeit und/oder der täglichen Dämmerung.",
+      "This module enables switching of a device depending on time and/or daily twilight.\n ": "Dieses Modul ermöglicht das Schalten eines Gerätes in Abhängigkeit von Uhrzeit und/oder der täglichen Dämmerung.\n ",
       "Switch": "Schalter",
       "Timing ...": "Zeitschaltung ...",
+      "Timer active": "Zeitschaltuhr aktiv",
       "Automatic:": "Automatik:",
       "Trigger switch on:": "Auslöser Einschalten:",
       "Trigger switch off:": "Auslöser Ausschalten:",
@@ -41,7 +42,10 @@
       "Instance inactive.": "Instanz ist inaktiv.",
       "Please select a trigger for switching on!": "Bitte wählen Sie einen Auslöser für das Einschalten aus!",
       "Please select a trigger for switching off!": "Bitte wählen Sie einen Auslöser für das Ausschalten aus!",
-      "Please select a differing switch-on and switch-off time!": "Bitte wählen Sie eine sich unterscheidende Einschalt- und Ausschaltzeitpunkt!"
-    }
+      "Please select a differing switch-on and switch-off time!": "Bitte wählen Sie eine sich unterscheidende Einschalt- und Ausschaltzeitpunkt!",
+      "Deactivate instance": "Instanz deaktivieren",
+      "Source code, donation and licence ...": "Quellcode, Spende und Lizenz ...",
+      "The software is free of charge for non-commercial use, I would appreciate a donation if you like the module.": "Die Software ist für die nicht kommzerielle Nutzung kostenlos, über eine Spende bei Gefallen des Moduls würde ich mich sehr freuen."
+}
   }
 }

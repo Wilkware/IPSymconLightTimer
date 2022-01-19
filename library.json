@@ -1,9 +1,12 @@
 {
     "id": "{E35A5221-41E8-C70F-C9BE-8F68E303B2E4}",
-    "author": "Wilkware (@Pitti)",
     "name": "Light Timer",
+    "author": "Wilkware (@Pitti)",
     "url": "https://wilkware.de",
-    "version": "1.5",
-    "build": 20210625,
-    "date": 1624615200
+    "compatibility": {
+        "version": "6.0"
+    },
+    "version": "1.6",
+    "build": 20220119,
+    "date": 1642590000
 }
