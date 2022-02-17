@@ -7,11 +7,23 @@
                 {"type": "Label", "label": "\nLight Timer\n ", "link": false, "bold": true}
             ]
         },
-        {"type": "Label", "label": "This module enables switching of a device depending on time and/or daily twilight.\n "},
-        {"type": "CheckBox", "name": "InstanceInactive", "caption": "Deactivate instance"},
+        {"type": "Label", "label": "This module enables the switching of devices depending on the time of day and/or the twilight of the day.\n "},
         {
             "type": "ExpansionPanel",
-            "caption": "Timing ...",
+            "caption": "Circuit ...",
+            "items": [
+                {"type": "Label", "caption": "... can be globally activated or deactivated via the following switch:"},
+                {"type": "RowLayout",
+                    "items": [
+                        {"type": "Label", "label": "Off"},
+                        {"type": "CheckBox", "name": "InstanceActive", "caption": "On"}
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "Timing control ...",
             "items": [
                 {
                     "type": "RowLayout",
@@ -155,18 +167,42 @@
         },
         {
             "type": "ExpansionPanel",
-            "caption": "Device ...",
+            "caption": "Devices ...",
             "items": [
-                {"type": "SelectVariable", "name": "DeviceVariable", "caption": "Switch Variable:",  "width": "450px"},
+                {"type": "Select", "name": "DeviceNumber", "caption": "Number of devices:", "width": "450px", "onChange":"IPS_RequestAction($id,'OnDeviceNumber', $DeviceNumber);",
+                    "options": [
+                        { "caption": "One device", "value": 0 },
+                        { "caption": "Multiple devices", "value": 1 }
+                    ]
+                },
+                {"type": "SelectVariable", "name": "DeviceVariable", "caption": "Switch Variable:", "width": "450px"},
+                {"type": "List", "name": "DeviceVariables", "caption": "Switch Variables:", "add": true, "delete": true, "rowCount": 4,
+                    "columns": [
+                        {
+                            "name": "VariableID",
+                            "caption": "Variable",
+                            "width": "auto",
+                            "add": 0,
+                            "edit": {
+                                "type": "SelectVariable"
+                            }
+                        },
+                        {
+                            "name": "Status",
+                            "caption": "Status",
+                            "width": "150px",
+                            "add": "New"
+                        }
+                    ]
+                },
                 {"type": "Label", "name": "DeviceExec", "caption": "... simultaneous execution of a script."},
                 {"type": "SelectScript", "name": "DeviceScript", "caption": "Script:",  "width": "450px"}
             ]
         },
         {
             "type": "ExpansionPanel",
-            "caption": "Settings ...",
+            "caption": "Advanced Settings ...",
             "items": [
-                {"type": "CheckBox", "name": "SettingsBool", "caption": "Switch variable is only a simple boolean!"},
                 {"type": "CheckBox", "name": "SettingsTime", "caption": "Switch variable only on or off if time sequence within a day is correct (only if weekly schedule is included)!"},
                 {"type": "CheckBox", "name": "SettingsSwitch", "caption": "Additionally create a normal switch variable (e.g. for WebFront)?"}
             ]

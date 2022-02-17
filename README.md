@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.6.20220119-orange.svg)](https://github.com/Wilkware/IPSymconWeatherWarning)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.0.20220216-orange.svg)](https://github.com/Wilkware/IPSymconWeatherWarning)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconLightTimer/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconLightTimer/actions)
 
@@ -59,7 +59,13 @@ __Konfigurationsseite__:
 
 Einstellungsbereich:
 
-> Zeitschaltung ...
+> Schaltung ...
+
+Name                  | Beschreibung
+--------------------- | ---------------------------------
+An /Aus               | Schalter zum Aktivieren bzw. Deaktivieren der gesamten Schaltung, z.B. Weihnachtsbeleuchtung nur im Winter ;-)
+
+> Zeitssteuerung ...
 
 Name                  | Beschreibung
 --------------------- | ---------------------------------
@@ -67,18 +73,19 @@ Auslöser Einschalten  | Auswahlmöglichkeiten: Aus; Sonnenaufgang oder -unterga
 Auslöser Ausschalten  | Auswahlmöglichkeiten: ; Sonnenaufgang oder -untergang; zivile, nautische oder astronomische Dämmerung; Wochenplan (Aus)
 (Zeitplan)            | Hinterlegung einer täglichen Uhrzeit für AN & AUS (Montag - Sonntag)
 
-> Gerät ...
+> Geräte ...
 
 Name                  | Beschreibung
 --------------------- | ---------------------------------
-Schaltvariable        | Schalt(Aktions-)variable
+Geräteanzahl          | Auswahl bzw. Umschalter zwischen einzelnen und mehreren Geräten
+Schaltvariable        | Schalt(Aktions-)variable (ein Gerät)
+Schaltvariablen       | Liste von Geräten (mehrere Geräte)
 Skript                | Auszuführendes Skript (Status true/false wird als Array 'State' übergeben)
 
 > Einstellungen ...
 
 Name                  | Beschreibung
 --------------------- | ---------------------------------
-Schaltvariable ist eine reine boolesche Variable! | true/false
 Schaltvariable nur ein- bzw. ausschalten wenn zeitliche Abfolge korrekt ist (nur in Verbindung mit einem Wochenplan)! | true/false
 Zusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)? | true/false
 
@@ -91,6 +98,15 @@ Man kann die Statusvariable (Schalter) direkt im WF verlinken.
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v2.0.20220216
+
+* _NEU_: Umschalten zwischen einem oder mehreren Geräten
+* _NEU_: Eine reine boolsche Schaltvariable (ein Gerät) wird automatisch erkannt
+* _NEU_: Referenzierung der Gerätevariablen hinzugefügt
+* _FIX_: Globale Aktivierung bzw. Deaktivierung der Schaltung umgebaut
+* _FIX_: Schaltung der Proxy Schaltvariable für Webfront korrigiert
+* _FIX_: Übersetzungen erweitert bzw. korrigiert
 
 v1.6.20220119
 

@@ -11,6 +11,7 @@ class LightTimer extends IPSModule
     use ProfileHelper;
     use EventHelper;
     use DebugHelper;
+    use VariableHelper;
 
     // Timing constant
     private const TIMING_ON = 'On';
@@ -20,6 +21,10 @@ class LightTimer extends IPSModule
     private const TIMING_WEEKLYON = 'WeeklySchedulOn';
     private const TIMING_WEEKLYOFF = 'WeeklySchedulOff';
     private const TIMING_SEPERATOR = 'None';
+
+    // Devices constant
+    private const DEVICE_ONE = 0;
+    private const DEVICE_MULTIPLE = 1;
 
     // Schedule constant
     private const SCHEDULE_ON = 1;
@@ -38,15 +43,16 @@ class LightTimer extends IPSModule
         //Never delete this line!
         parent::Create();
         // Instance
-        $this->RegisterPropertyBoolean('InstanceInactive', false);
+        $this->RegisterPropertyBoolean('InstanceActive', true);
         // Timming
         $this->RegisterPropertyString('TimingStart', 'Sunrise');
         $this->RegisterPropertyString('TimingEnd', 'Sunset');
         // Device
+        $this->RegisterPropertyInteger('DeviceNumber', 0);
         $this->RegisterPropertyInteger('DeviceVariable', 0);
+        $this->RegisterPropertyString('DeviceVariables', '[]');
         $this->RegisterPropertyInteger('DeviceScript', 0);
         // Settings
-        $this->RegisterPropertyBoolean('SettingsBool', false);
         $this->RegisterPropertyBoolean('SettingsTime', false);
         $this->RegisterPropertyBoolean('SettingsSwitch', false);
         // Schedule
@@ -98,6 +104,17 @@ class LightTimer extends IPSModule
                 }
             }
         }
+        // number of devices
+        $number = $this->ReadPropertyInteger('DeviceNumber');
+        $form['elements'][4]['items'][1]['visible'] = ($number === self::DEVICE_ONE);
+        $form['elements'][4]['items'][2]['visible'] = ($number === self::DEVICE_MULTIPLE);
+        // device list (set status column)
+        $variables = json_decode($this->ReadPropertyString('DeviceVariables'), true);
+        foreach ($variables as $variable) {
+            $form['elements'][4]['items'][2]['values'][] = [
+                'Status' => $this->GetVariableStatus($variable['VariableID']),
+            ];
+        }
         // return form
         return json_encode($form);
     }
@@ -120,15 +137,64 @@ class LightTimer extends IPSModule
         if ($this->ReadAttributeInteger('ConditionalEnd') > 0) {
             $this->UnregisterMessage($this->ReadAttributeInteger('ConditionalEnd'), VM_UPDATE);
         }
+
         //Never delete this line!
         parent::ApplyChanges();
-        //Create our trigger
-        if (IPS_VariableExists($this->ReadPropertyInteger('DeviceVariable'))) {
-            $this->RegisterMessage($this->ReadPropertyInteger('DeviceVariable'), VM_UPDATE);
+
+        //Delete all references in order to readd them
+        foreach ($this->GetReferenceList() as $referenceID) {
+            $this->UnregisterReference($referenceID);
+        }
+        //Delete all registrations in order to readd them
+        foreach ($this->GetMessageList() as $senderID => $messages) {
+            foreach ($messages as $message) {
+                $this->UnregisterMessage($senderID, $message);
+            }
+        }
+        //Register references
+        $variables = json_decode($this->ReadPropertyString('DeviceVariables'), true);
+        foreach ($variables as $variable) {
+            if (IPS_VariableExists($variable['VariableID'])) {
+                $this->RegisterReference($variable['VariableID']);
+            }
+        }
+        $variable = $this->ReadPropertyInteger('DeviceVariable');
+        if (IPS_VariableExists($variable)) {
+            if (IPS_VariableExists($variable)) {
+                $this->RegisterReference($variable);
+            }
+        }
+        //Register update messages
+        $number = $this->ReadPropertyInteger('DeviceNumber');
+        if ($number == self::DEVICE_ONE) {
+            //Create one trigger
+            if (IPS_VariableExists($variable)) {
+                $this->RegisterMessage($variable, VM_UPDATE);
+            } else {
+                $this->SetStatus(104);
+                return;
+            }
+        } else {
+            //Create multiple trigger
+            $ok = 0;
+            foreach ($variables as $variable) {
+                if ($this->GetVariableStatus($variable['VariableID']) == 'OK') {
+                    $ok++;
+                }
+            }
+            //If we are missing triggers or devices will not work
+            if ((empty($variables)) || ($ok != count($variables))) {
+                $this->SetStatus(104);
+                return;
+            }
+            //Register update messages
+            foreach ($variables as $variable) {
+                $this->RegisterMessage($variable['VariableID'], VM_UPDATE);
+            }
         }
         // On/Off Check
-        $inactive = $this->ReadPropertyBoolean('InstanceInactive');
-        if ($inactive) {
+        $active = $this->ReadPropertyBoolean('InstanceActive');
+        if (!$active) {
             $this->SetStatus(104);
             return;
         }
@@ -210,10 +276,22 @@ class LightTimer extends IPSModule
         // $this->SendDebug(__FUNCTION__, 'SenderId: '. $senderID . 'Data: ' . print_r($data, true), 0);
         switch ($message) {
             case VM_UPDATE:
-                // Safety Check
-                $varID = $this->ReadPropertyInteger('DeviceVariable');
+                $varID = 0;
+                // Extract vars
+                $number = $this->ReadPropertyInteger('DeviceNumber');
+                if ($number == self::DEVICE_ONE) {
+                    $varID = $this->ReadPropertyInteger('DeviceVariable');
+                } else {
+                    $variables = json_decode($this->ReadPropertyString('DeviceVariables'), true);
+                    foreach ($variables as $variable) {
+                        if ($variable['VariableID'] == $senderID) {
+                            $varID = $senderID;
+                        }
+                    }
+                }
                 $startID = $this->ReadAttributeInteger('ConditionalStart');
                 $endID = $this->ReadAttributeInteger('ConditionalEnd');
+                // Safety Check
                 if (($senderID != $varID) || ($senderID != $startID) || ($senderID != $endID)) {
                     if (($senderID == $varID) && ($data[1] == true)) {
                         $this->SendDebug(__FUNCTION__, $senderID . ': device variable changed');
@@ -375,20 +453,73 @@ class LightTimer extends IPSModule
             }
         }
         // Check Variable
-        $dv = $this->ReadPropertyInteger('DeviceVariable');
-        if ($dv != 0) {
-            $bv = $this->ReadPropertyBoolean('SettingsBool');
-            if ($bv) {
-                $ret = @SetValueBoolean($dv, boolval($state));
-            } else {
+        $number = $this->ReadPropertyInteger('DeviceNumber');
+        if ($number == self::DEVICE_ONE) {
+            $dv = $this->ReadPropertyInteger('DeviceVariable');
+            if ($dv != 0) {
                 $ret = @RequestAction($dv, boolval($state));
+                if ($ret === false) {
+                    $this->SendDebug(__FUNCTION__, 'Device #' . $dv . ' could not be switched by RequestAction!');
+                    $ret = @SetValueBoolean($dv, boolval($state));
+                    if ($ret === false) {
+                        $this->SendDebug(__FUNCTION__, 'Device could not be switched by Boolean!');
+                    }
+                }
+                if ($ret === false) {
+                    $this->LogMessage('Device could not be switched (UNREACH)!');
+                    return false;
+                }
+            }
+            return $ret;
+        } else {
+            $variables = json_decode($this->ReadPropertyString('DeviceVariables'), true);
+            $ret = true;
+            foreach ($variables as $variable) {
+                $ret = @RequestAction($variable['VariableID'], boolval($state));
+                if ($ret === false) {
+                    $this->SendDebug(__FUNCTION__, 'Device #' . $variable['VariableID'] . ' could not be switched by RequestAction!');
+                    $ret = false;
+                }
             }
             if ($ret === false) {
-                $this->SendDebug(__FUNCTION__, 'Device could not be switched (UNREACH)!');
-                return false;
+                $this->LogMessage('One or more devices could not be switched!');
+            }
+            return $ret;            
+        }
+    }
+
+    private function GetVariableStatus($vid)
+    {
+        if (!IPS_VariableExists($vid)) {
+            return $this->Translate('Missing');
+        } else {
+            $var = IPS_GetVariable($vid);
+            switch ($var['VariableType']) {
+                case VARIABLETYPE_BOOLEAN:
+                    if ($var['VariableCustomProfile'] != '') {
+                        $profile = $var['VariableCustomProfile'];
+                    } else {
+                        $profile = $var['VariableProfile'];
+                    }
+                    if (!IPS_VariableProfileExists($profile)) {
+                        return $this->Translate('Profile required');
+                    }
+                    // FIXME: No break. Please add proper comment if intentional
+                case VARIABLETYPE_INTEGER:
+                case VARIABLETYPE_FLOAT:
+                    if ($var['VariableCustomAction'] != 0) {
+                        $action = $var['VariableCustomAction'];
+                    } else {
+                        $action = $var['VariableAction'];
+                    }
+                    if (!($action > 10000)) {
+                        return $this->Translate('Action required');
+                    }
+                    return 'OK';
+                default:
+                    return $this->Translate('Bool/Int/Float required');
             }
         }
-        return $ret;
     }
 
     /**
@@ -526,6 +657,18 @@ class LightTimer extends IPSModule
         }
         $this->SetBuffer('schedule', ($ts > 0 ? $ts + $now : 0) . ':' . ($te > 0 ? $te + $now : 0));
         $this->SendDebug(__FUNCTION__, 'Buffer: ' . $this->GetBuffer('schedule'));
+    }
+
+    /**
+     * User has select an new number of devices.
+     *
+     * @param string $id select ID.
+     */
+    private function OnDeviceNumber($id)
+    {
+        $this->SendDebug(__FUNCTION__, 'Value: ' . $id);
+        $this->UpdateFormField('DeviceVariable', 'visible', ($id == self::DEVICE_ONE));
+        $this->UpdateFormField('DeviceVariables', 'visible', ($id == self::DEVICE_MULTIPLE));
     }
 
     /**
