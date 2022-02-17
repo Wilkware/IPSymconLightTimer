@@ -484,7 +484,7 @@ class LightTimer extends IPSModule
             if ($ret === false) {
                 $this->LogMessage('One or more devices could not be switched!');
             }
-            return $ret;            
+            return $ret;
         }
     }
 
