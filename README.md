@@ -22,21 +22,21 @@ Dieses Modul ermöglicht das Schalten eines Gerätes (Variable und/oder Skripts)
 ### 1. Funktionsumfang
 
 Für eine einfache Zeitschaltung wäre dieses Modul normalerweise nicht notwendig. Die Erstellung einen Wochenplanes oder eines zyklischen Ereignisses ist mit IPS Bordmitteln recht einfach möglich. Interessant wird die Sache erst wenn man bedingtes und zyklisches Schalten verbinden möchte.
-Für eine solche Kombination gibt es eine Reihe von Anwendungsfälle, wie z.B ...
+Für eine solche Kombination gibt es eine Reihe von Anwendungsfälle, wie z.B. ...
 
 * Rollläden/Jalousien am Morgen zu einer definierten Zeit hochfahren (Arbeitstag unabhängig von Jahreszeit), aber abends zum Sonnenuntergang runterfahren
-* Außenbeleutung bei einsetzender Dunkelheit einschalten, aber pünktlich um Mitternacht wieder ausschalten
+* Außenbeleuchtung bei einsetzender Dunkelheit einschalten, aber pünktlich um Mitternacht wieder ausschalten
 * Haustür Notlicht einsetzenden der Dämmerung Ein- bzw.- Ausschalten
-* oder zur Weihnachtszeit die Beleutung situativ schalten.
+* oder zur Weihnachtszeit die Beleuchtung situativ schalten.
 
-Das nur um einige Anregungen sogeben. Wahrscheinlich gibt es da noch einiges mehr an Ideen, welche sich so umsetzen lassen.
+Das nur um einige Anregungen zu geben. Wahrscheinlich gibt es da noch einiges mehr an Ideen, welche sich so umsetzen lassen.
 
 * Zeitschaltung anhand verschiedener Einstellmöglichkeiten:
   1. Aus => Ein- bzw. Ausschalten wird nicht vollzogen (externer Auslöser)
   2. Sonnengang => 8 mögliche Zeitpunkte wählbar (Sonnenaufgang und -untergang; zivile, nautische oder astronomische Dämmerung)
   3. Wochenplan => Steuerung über Zeitplan
-* Zusätzlich bzw. ausschließlich kann ein Script ausgeführt werden.
-* Schaltvariable muss nicht eine Aktionsvariable sein, sondern kann auch einfach eine boolsche Variable sein.
+* Zusätzlich bzw. ausschließlich kann ein Skript ausgeführt werden.
+* Schaltvariable muss nicht eine Aktionsvariable sein, sondern kann auch einfach eine boolesche Variable sein.
 * Option das Einschalten nur zu erlauben, wenn sich die Zeiten nicht überschneiden (zeitlich korrekte Abfolge, AN-vor-AUS).
 * Statusvariable als Proxy-Schalter, z.B. für Verwendung im WebFront.
 * Schalten kann über mehrere Tage hinweg organisiert werden (gezielter Einsatz des täglichen Zeitplanes).
@@ -151,7 +151,7 @@ Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den let
 
 ## Spenden
 
-Die Software ist für die nicht kommzerielle Nutzung kostenlos, über eine Spende bei Gefallen des Moduls würde ich mich freuen.
+Die Software ist für die nicht kommerzielle Nutzung kostenlos, über eine Spende bei Gefallen des Moduls würde ich mich freuen.
 
 [![PayPal](https://img.shields.io/badge/PayPal-spenden-00457C.svg?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8816166)
 
