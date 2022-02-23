@@ -102,8 +102,8 @@ Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 v2.0.20220216
 
 * _NEU_: Umschalten zwischen einem oder mehreren Geräten
-* _NEU_: Eine reine boolsche Schaltvariable (ein Gerät) wird automatisch erkannt
-* _NEU_: Referenzierung der Gerätevariablen hinzugefügt
+* _NEU_: Eine reine boolesche Schaltvariable (ein Gerät) wird automatisch erkannt
+* _NEU_: Referenzieren der Gerätevariablen hinzugefügt
 * _FIX_: Globale Aktivierung bzw. Deaktivierung der Schaltung umgebaut
 * _FIX_: Schaltung der Proxy Schaltvariable für Webfront korrigiert
 * _FIX_: Übersetzungen erweitert bzw. korrigiert
