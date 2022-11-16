@@ -10,16 +10,16 @@ Dieses Modul ermöglicht das Schalten eines Gerätes (Variable und/oder Skripts)
 
 ## Inhaltverzeichnis
 
-1. [Funktionsumfang](#1-funktionsumfang)
-2. [Voraussetzungen](#2-voraussetzungen)
-3. [Installation](#3-installation)
-4. [Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Profile](#5-statusvariablen-und-profile)
-6. [WebFront](#6-webfront)
-7. [PHP-Befehlsreferenz](#7-php-befehlsreferenz)
+1. [Funktionsumfang](#user-content-1-funktionsumfang)
+2. [Voraussetzungen](#user-content-2-voraussetzungen)
+3. [Installation](#user-content-3-installation)
+4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
+5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
+6. [WebFront](#user-content-6-webfront)
+7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
 8. [Versionshistorie](#user-content-8-versionshistorie)
 
-### [1. Funktionsumfang](#1-funktionsumfang)
+### 1. Funktionsumfang
 
 Für eine einfache Zeitschaltung wäre dieses Modul normalerweise nicht notwendig. Die Erstellung einen Wochenplanes oder eines zyklischen Ereignisses ist mit IPS Bordmitteln recht einfach möglich. Interessant wird die Sache erst wenn man bedingtes und zyklisches Schalten verbinden möchte.
 Für eine solche Kombination gibt es eine Reihe von Anwendungsfälle, wie z.B. ...
@@ -41,17 +41,17 @@ Das nur um einige Anregungen zu geben. Wahrscheinlich gibt es da noch einiges me
 * Statusvariable als Proxy-Schalter, z.B. für Verwendung im WebFront.
 * Schalten kann über mehrere Tage hinweg organisiert werden (gezielter Einsatz des täglichen Zeitplanes).
 
-### [2. Voraussetzungen](#2-voraussetzungen)
+### 2. Voraussetzungen
 
 * IP-Symcon ab Version 6.0
 
-### [3. Installation](#3-installation)
+### 3. Installation
 
 * Über den Modul Store das Modul Licht Zeitschaltuhr installieren.
 * Alternativ Über das Modul-Control folgende URL hinzufügen.  
 `https://github.com/Wilkware/IPSymconLightTimer` oder `git://github.com/Wilkware/IPSymconLightTimer.git`
 
-### [4. Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
+### 4. Einrichten der Instanzen in IP-Symcon
 
 * Unter "Instanz hinzufügen" ist das 'Light Timer'-Modul (Alias: Licht Zeitschaltuhr, Zeitschaltuhr) unter dem Hersteller '(Sonstige)' aufgeführt.
 
@@ -89,7 +89,7 @@ Name                  | Beschreibung
 Schaltvariable nur ein- bzw. ausschalten wenn zeitliche Abfolge korrekt ist (nur in Verbindung mit einem Wochenplan)! | true/false
 Zusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)? | true/false
 
-### [5. Statusvariablen und Profile](#5-statusvariablen-und-profile)
+### 5. Statusvariablen und Profile
 
 Die Statusvariablen werden je nach Einstellung automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
@@ -106,11 +106,11 @@ Name                 | Typ       | Beschreibung
 Twinkly.Mode         | Integer   | 0(Aus), 1(An), 2(Demo), 3(Echtzeit)
 Twinkly.Switch       | Integer   | 0(Aus), 1(An)
 
-### [6. WebFront](#6-webfront)
+### 6. WebFront
 
 Man kann die Statusvariable (Schalter) direkt im WF verlinken.
 
-### [7. PHP-Befehlsreferenz](#7-php-befehlsreferenz)
+### 7. PHP-Befehlsreferenz
 
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
