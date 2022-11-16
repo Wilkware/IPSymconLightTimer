@@ -17,7 +17,7 @@ Dieses Modul ermöglicht das Schalten eines Gerätes (Variable und/oder Skripts)
 5. [Statusvariablen und Profile](#5-statusvariablen-und-profile)
 6. [WebFront](#6-webfront)
 7. [PHP-Befehlsreferenz](#7-php-befehlsreferenz)
-8. [Versionshistorie](#8-versionshistorie)
+8. [Versionshistorie](#user-content-8-versionshistorie)
 
 ### [1. Funktionsumfang](#1-funktionsumfang)
 
@@ -114,7 +114,7 @@ Man kann die Statusvariable (Schalter) direkt im WF verlinken.
 
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
-### [8. Versionshistorie](#8-versionshistorie)
+### 8. Versionshistorie
 
 v2.0.20220216
 
