@@ -303,7 +303,7 @@ class LightTimer extends IPSModule
                 } else {
                     $this->SendDebug(__FUNCTION__, $senderID . ' unknown!');
                 }
-            break;
+                break;
         }
     }
 
@@ -506,6 +506,7 @@ class LightTimer extends IPSModule
                     }
                     // FIXME: No break. Please add proper comment if intentional
                 case VARIABLETYPE_INTEGER:
+                    // No break, because for Integer & Float same treatment
                 case VARIABLETYPE_FLOAT:
                     if ($var['VariableCustomAction'] != 0) {
                         $action = $var['VariableCustomAction'];
