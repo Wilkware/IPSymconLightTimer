@@ -504,7 +504,8 @@ class LightTimer extends IPSModule
                     if (!IPS_VariableProfileExists($profile)) {
                         return $this->Translate('Profile required');
                     }
-                    // FIXME: No break. Please add proper comment if intentional
+                    // No break, because for Boolean, Integer & Float same treatment
+                    // FIXME: No break. Add additional comment above this line if intentional!
                 case VARIABLETYPE_INTEGER:
                     // No break, because for Integer & Float same treatment
                 case VARIABLETYPE_FLOAT:
