@@ -91,24 +91,11 @@ Zusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)? | t
 
 ### 5. Statusvariablen und Profile
 
-Die Statusvariablen werden je nach Einstellung automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
-
-Name                   | Typ       | Beschreibung
----------------------- | --------- | ----------------
-Helligkeit             | Integer   | Helligkeitsslider (0-100%)
-Modus                  | Integer   | Schalter für alle 4 Modi (AUS|AN|DEMO|ECHTZEIT)
-Schalter               | Integer   | Einfacher Schalter für AN und AUS
-
-Folgende Profile werden angelegt:
-
-Name                 | Typ       | Beschreibung
--------------------- | --------- | ----------------
-Twinkly.Mode         | Integer   | 0(Aus), 1(An), 2(Demo), 3(Echtzeit)
-Twinkly.Switch       | Integer   | 0(Aus), 1(An)
+Es werden keine zusätzlichen Statusvariablen/Profile benötigt.
 
 ### 6. WebFront
 
-Man kann die Statusvariable (Schalter) direkt im WF verlinken.
+Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 
 ### 7. PHP-Befehlsreferenz
 
