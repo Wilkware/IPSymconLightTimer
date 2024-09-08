@@ -1,7 +1,7 @@
 {
     "translations": {
         "de": {
-            "Timer switch": "Zeitschaltuhr",
+            "Timer Switch": "Zeitschaltuhr",
             "Timer": "Zeitschaltuhr",
             "\nTimer Switch\n ": "\nZeitschaltuhr\n ",
             "This module enables the switching of devices depending on the time of day and/or the twilight of the day.\n ": "Dieses Modul ermöglicht das Schalten von Geräten in Abhängigkeit von Uhrzeit und/oder der täglichen Dämmerung.\n ",
