@@ -5,12 +5,14 @@ declare(strict_types=1);
 // Generell funktions
 require_once __DIR__ . '/../libs/_traits.php';
 
-// CLASS Light Timer
-class LightTimer extends IPSModule
+/**
+ * CLASS Timer Switch
+ */
+class TimerSwitch extends IPSModule
 {
-    use ProfileHelper;
-    use EventHelper;
     use DebugHelper;
+    use EventHelper;
+    use ProfileHelper;
     use VariableHelper;
 
     // Timing constant
@@ -265,11 +267,12 @@ class LightTimer extends IPSModule
     }
 
     /**
-     * Interne Funktion des SDK.
-     * data[0] = neuer Wert
-     * data[1] = wurde Wert geändert?
-     * data[2] = alter Wert
-     * data[3] = Timestamp.
+     * MessageSink - internal SDK funktion.
+     *
+     * @param mixed $timeStamp Message timeStamp
+     * @param mixed $senderID Sender ID
+     * @param mixed $message Message type
+     * @param mixed $data data[0] = new value, data[1] = value changed, data[2] = old value, data[3] = timestamp
      */
     public function MessageSink($timeStamp, $senderID, $message, $data)
     {
@@ -506,6 +509,7 @@ class LightTimer extends IPSModule
                     }
                     // No break, because for Boolean, Integer & Float same treatment
                     // FIXME: No break. Add additional comment above this line if intentional!
+                    // No break. Add additional comment above this line if intentional!
                 case VARIABLETYPE_INTEGER:
                     // No break, because for Integer & Float same treatment
                 case VARIABLETYPE_FLOAT:

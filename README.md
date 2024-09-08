@@ -1,10 +1,10 @@
 # Licht Zeitschaltuhr (Light Timer)
 
-[![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-2.0.20220216-orange.svg)](https://github.com/Wilkware/IPSymconLightTimer)
-[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Actions](https://github.com/Wilkware/IPSymconLightTimer/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconLightTimer/actions)
+[![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.0.20220216-orange.svg?style=flat-square)](https://github.com/Wilkware/TimerSwitch)
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/TimerSwitch/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/TimerSwitch/actions)
 
 Dieses Modul ermöglicht das Schalten eines Gerätes (Variable und/oder Skripts) in Abhängigkeit von Uhrzeit und/oder des täglichen Sonnenganges.
 
@@ -15,7 +15,7 @@ Dieses Modul ermöglicht das Schalten eines Gerätes (Variable und/oder Skripts)
 3. [Installation](#user-content-3-installation)
 4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
 5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
-6. [WebFront](#user-content-6-webfront)
+6. [Visualisierung](#user-content-6-visualisierung)
 7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
 8. [Versionshistorie](#user-content-8-versionshistorie)
 
@@ -43,17 +43,17 @@ Das nur um einige Anregungen zu geben. Wahrscheinlich gibt es da noch einiges me
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.0
+* IP-Symcon ab Version 6.4
 
 ### 3. Installation
 
-* Über den Modul Store das Modul Licht Zeitschaltuhr installieren.
+* Über den Modul Store das Modul _Zeitschaltuhr_ installieren.
 * Alternativ Über das Modul-Control folgende URL hinzufügen.  
-`https://github.com/Wilkware/IPSymconLightTimer` oder `git://github.com/Wilkware/IPSymconLightTimer.git`
+`https://github.com/Wilkware/TimerSwitch` oder `git://github.com/Wilkware/TimerSwitch.git`
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-* Unter "Instanz hinzufügen" ist das 'Light Timer'-Modul (Alias: Licht Zeitschaltuhr, Zeitschaltuhr) unter dem Hersteller '(Sonstige)' aufgeführt.
+* Unter "Instanz hinzufügen" ist das _Zeitschaltuhr_-Modul unter dem Hersteller '(Geräte)' aufgeführt.
 
 __Konfigurationsseite__:
 
@@ -93,7 +93,7 @@ Zusätzlich noch eine normale Schaltervariable anlegen (z.B. für Webfront)? | t
 
 Es werden keine zusätzlichen Statusvariablen/Profile benötigt.
 
-### 6. WebFront
+### 6. Visualisierung
 
 Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 
@@ -102,6 +102,16 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v3.0.20240908
+
+* _NEU_: Modulumbenennung in nur noch "Zeitschaltuhr" (ohne Licht-...)
+* _NEU_: Kompatibilität auf IPS 6.4 hoch gesetzt
+* _FIX_: Bibliotheks- bzw. Modulinfos vereinheitlicht
+* _FIX_: Namensnennung und Repo vereinheitlicht
+* _FIX_: Update Style-Checks
+* _FIX_: Übersetzungen überarbeitet und verbessert
+* _FIX_: Dokumentation vereinheitlicht
 
 v2.0.20220216
 
